@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "GSS Hong"
+version = "1.0.0"
+id = "artifacts/gss-hong"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21741
+
+[services.development]
+run = "pnpm --filter @workspace/gss-hong run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/gss-hong", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/gss-hong/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21741"
+BASE_PATH = "/"
