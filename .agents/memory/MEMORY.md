@@ -1,0 +1,1 @@
+- [Vite artifact theme tokens](vite-theme-tokens.md) — index.css color vars use raw `H S% L%` triplets consumed via hsl(var(--x)); never paste hex/oklch directly.
