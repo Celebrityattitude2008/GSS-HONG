@@ -1,12 +1,14 @@
 import { useState } from "react";
+import { Switch, Route, Link } from "wouter";
 import {
   Menu, X, GraduationCap, FlaskConical, BookOpen, Users, Phone,
   Mail, MapPin, ArrowRight, Calendar, Microscope, Award, Send,
-  Atom, Eye, EyeOff, ChevronRight, Globe, Cpu,
+  Atom, Eye, EyeOff, ChevronRight, Cpu, Landmark, Printer,
+  LogOut, IdCard,
 } from "lucide-react";
 
 // ─── Page type ────────────────────────────────────────────────────────────────
-type Page = "home" | "academics" | "alumni" | "news" | "contact";
+type Page = "home" | "academics" | "portal" | "news" | "contact";
 
 // ─── Image URLs ───────────────────────────────────────────────────────────────
 const IMGS = {
@@ -59,13 +61,12 @@ function Navbar({ page, setPage }: { page: Page; setPage: (p: Page) => void }) {
     { label: "Home",     target: "home" },
     { label: "About Us", target: "home" },
     { label: "Academics",target: "academics" },
-    { label: "Alumni",   target: "alumni" },
     { label: "News",     target: "news" },
     { label: "Contact",  target: "contact" },
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 pt-3 px-4 md:px-6">
+    <header className="fixed top-0 left-0 right-0 z-50 pt-3 px-4 md:px-6 print:hidden">
       <div className="max-w-7xl mx-auto">
         <div
           className="flex items-center justify-between px-5 py-2.5 rounded-2xl"
@@ -98,7 +99,7 @@ function Navbar({ page, setPage }: { page: Page; setPage: (p: Page) => void }) {
 
           <div className="flex items-center gap-3">
             <button
-              onClick={() => nav("alumni")}
+              onClick={() => nav("portal")}
               className="hidden lg:flex items-center gap-2 bg-accent text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-md hover:bg-accent/90 transition-all hover:-translate-y-0.5"
               style={{ fontFamily: "'Inter',sans-serif" }}
             >
@@ -124,7 +125,7 @@ function Navbar({ page, setPage }: { page: Page; setPage: (p: Page) => void }) {
                 {item.label}
               </button>
             ))}
-            <button onClick={() => nav("alumni")} className="mt-1 bg-accent text-white py-2.5 rounded-xl text-sm font-semibold" style={{ fontFamily: "'Inter',sans-serif" }}>
+            <button onClick={() => nav("portal")} className="mt-1 bg-accent text-white py-2.5 rounded-xl text-sm font-semibold" style={{ fontFamily: "'Inter',sans-serif" }}>
               Portal Login
             </button>
           </div>
@@ -139,7 +140,7 @@ function Footer({ setPage }: { setPage: (p: Page) => void }) {
   function nav(p: Page) { setPage(p); window.scrollTo({ top: 0, behavior: "smooth" }); }
 
   return (
-    <footer style={{ background: "#091f3a" }} className="text-white py-14 px-6">
+    <footer style={{ background: "#091f3a" }} className="text-white py-14 px-6 print:hidden">
       <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-10">
         <div>
           <div className="flex items-center gap-3 mb-4">
@@ -150,7 +151,7 @@ function Footer({ setPage }: { setPage: (p: Page) => void }) {
             </div>
           </div>
           <p className="text-white/55 text-sm leading-relaxed" style={{ fontFamily: "'Inter',sans-serif" }}>
-            Nurturing excellence through rigorous science education and moral character development since 1967.
+            Nurturing excellence through rigorous science and arts education and moral character development since 1967.
           </p>
         </div>
 
@@ -158,20 +159,21 @@ function Footer({ setPage }: { setPage: (p: Page) => void }) {
           {
             title: "Quick Links",
             items: [
-              { label: "About Us",    page: "home"      as Page },
-              { label: "Academics",   page: "academics" as Page },
-              { label: "Alumni Hub",  page: "alumni"    as Page },
-              { label: "News",        page: "news"      as Page },
-              { label: "Contact",     page: "contact"   as Page },
+              { label: "About Us",      page: "home"      as Page },
+              { label: "Academics",     page: "academics" as Page },
+              { label: "Student Portal",page: "portal"    as Page },
+              { label: "News",          page: "news"      as Page },
+              { label: "Contact",       page: "contact"   as Page },
             ],
           },
           {
             title: "Departments",
             items: [
-              { label: "Chemistry",       page: "academics" as Page },
-              { label: "Biology",         page: "academics" as Page },
-              { label: "Physics",         page: "academics" as Page },
-              { label: "Computer Science",page: "academics" as Page },
+              { label: "Chemistry",           page: "academics" as Page },
+              { label: "Biology",             page: "academics" as Page },
+              { label: "Physics",             page: "academics" as Page },
+              { label: "Computer Science",    page: "academics" as Page },
+              { label: "Arts & Humanities",   page: "academics" as Page },
             ],
           },
         ].map((col, i) => (
@@ -213,7 +215,7 @@ function HomePage({ setPage }: { setPage: (p: Page) => void }) {
   const stats = [
     { val: "1967", label: "Year Founded" },
     { val: "10,000+", label: "Alumni Worldwide" },
-    { val: "5", label: "Science Depts." },
+    { val: "6", label: "Academic Depts." },
     { val: "Top 10", label: "State Ranking" },
   ];
 
@@ -222,6 +224,11 @@ function HomePage({ setPage }: { setPage: (p: Page) => void }) {
       icon: <FlaskConical size={28} />,
       title: "Pure Sciences",
       desc: "Biology, Chemistry, and Physics — each with dedicated laboratory facilities and qualified department heads.",
+    },
+    {
+      icon: <Landmark size={28} />,
+      title: "Arts & Humanities",
+      desc: "Literature-in-English, Government, Economics, and CRS/IRS tracks that build strong communicators and critical thinkers.",
     },
     {
       icon: <Cpu size={28} />,
@@ -239,7 +246,7 @@ function HomePage({ setPage }: { setPage: (p: Page) => void }) {
     {
       img: IMGS.graduation, tag: "Achievement", date: "June 15, 2025",
       title: "GSS Hong Records 94% Distinction Rate in 2025 WAEC",
-      excerpt: "Students excelled across all science subjects, maintaining the school's position as Adamawa's top science institution.",
+      excerpt: "Students excelled across both science and arts subjects, maintaining the school's position as one of Adamawa's top-performing institutions.",
     },
     {
       img: IMGS.lab, tag: "Facilities", date: "May 3, 2025",
@@ -284,7 +291,7 @@ function HomePage({ setPage }: { setPage: (p: Page) => void }) {
           </h1>
 
           <p className="text-white/75 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed" style={{ fontFamily: "'Inter',sans-serif" }}>
-            Shaping scientists, engineers, and innovators through world-class education and values-driven character development.
+            Shaping scientists, scholars, and leaders through world-class science and arts education and values-driven character development.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -296,11 +303,11 @@ function HomePage({ setPage }: { setPage: (p: Page) => void }) {
               Explore Academics <ArrowRight size={18} />
             </button>
             <button
-              onClick={() => nav("alumni")}
+              onClick={() => nav("portal")}
               className="px-8 py-4 rounded-xl font-semibold text-base text-white flex items-center justify-center gap-2 hover:-translate-y-0.5 transition-all"
               style={{ ...glass(0.18), fontFamily: "'Inter',sans-serif" }}
             >
-              Alumni Portal <GraduationCap size={18} />
+              Student Portal <GraduationCap size={18} />
             </button>
           </div>
         </div>
@@ -337,10 +344,10 @@ function HomePage({ setPage }: { setPage: (p: Page) => void }) {
               Government Secondary School, Hong has stood as a beacon of quality education in Adamawa State since its founding in 1967. Built on a foundation of scientific inquiry and moral discipline, the school has produced thousands of graduates who have gone on to distinguish themselves in medicine, engineering, research, and public service across Nigeria and beyond.
             </p>
             <p className="text-muted-foreground leading-relaxed mb-8 text-base" style={{ fontFamily: "'Inter',sans-serif" }}>
-              With a dedicated faculty of over 85 teachers, modern laboratory infrastructure, and a rigorous WAEC/NECO-aligned curriculum, GSS Hong consistently ranks among the foremost science schools in Northeastern Nigeria.
+              With a dedicated faculty of over 85 teachers, modern laboratory and classroom infrastructure, and a rigorous WAEC/NECO-aligned curriculum spanning both Science and Arts, GSS Hong consistently ranks among the foremost secondary schools in Northeastern Nigeria.
             </p>
             <div className="flex flex-wrap gap-2.5">
-              {["WAEC Certified", "NECO Accredited", "State Award Winner", "Science Focus"].map(t => (
+              {["WAEC Certified", "NECO Accredited", "State Award Winner", "Science & Arts"].map(t => (
                 <span key={t} className="px-4 py-1.5 rounded-full text-sm font-medium bg-primary/8 text-primary border border-primary/15" style={{ fontFamily: "'Inter',sans-serif" }}>{t}</span>
               ))}
             </div>
@@ -359,7 +366,7 @@ function HomePage({ setPage }: { setPage: (p: Page) => void }) {
                   <Award size={20} className="text-accent" />
                 </div>
                 <div>
-                  <p className="font-bold text-primary text-sm" style={{ fontFamily: "'Poppins',sans-serif" }}>Best Science School</p>
+                  <p className="font-bold text-primary text-sm" style={{ fontFamily: "'Poppins',sans-serif" }}>Best All-Round School</p>
                   <p className="text-xs text-muted-foreground" style={{ fontFamily: "'Inter',sans-serif" }}>Adamawa State · 2024</p>
                 </div>
               </div>
@@ -373,10 +380,10 @@ function HomePage({ setPage }: { setPage: (p: Page) => void }) {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-14">
             <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-accent text-xs font-semibold uppercase tracking-wider mb-4" style={{ fontFamily: "'Inter',sans-serif" }}>Academic Programs</span>
-            <h2 className="text-4xl md:text-5xl font-black text-white" style={{ fontFamily: "'Poppins',sans-serif" }}>World-Class Science Education</h2>
+            <h2 className="text-4xl md:text-5xl font-black text-white" style={{ fontFamily: "'Poppins',sans-serif" }}>World-Class Science &amp; Arts Education</h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 mb-12">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             {programs.map((prog, i) => (
               <div
                 key={i}
@@ -411,7 +418,7 @@ function HomePage({ setPage }: { setPage: (p: Page) => void }) {
         </div>
       </section>
 
-      {/* ── Alumni Hub Preview ── */}
+      {/* ── Student Portal Preview ── */}
       <section className="py-24 px-6 bg-background">
         <div className="max-w-7xl mx-auto">
           <div className="rounded-3xl overflow-hidden relative" style={{ background: "linear-gradient(135deg, #0D3B6E, #1a5295)" }}>
@@ -422,38 +429,31 @@ function HomePage({ setPage }: { setPage: (p: Page) => void }) {
             <div className="relative z-10 grid md:grid-cols-[3fr_2fr] items-center">
               <div className="p-12 md:p-16">
                 <span className="inline-block px-3 py-1 rounded-full bg-accent/30 text-accent text-xs font-semibold uppercase tracking-wider mb-5" style={{ fontFamily: "'Inter',sans-serif" }}>
-                  Alumni Hub
+                  Student Portal
                 </span>
                 <h2 className="text-4xl md:text-5xl font-black text-white mb-5 leading-tight" style={{ fontFamily: "'Poppins',sans-serif" }}>
-                  Reconnect With<br />Your GSS Family
+                  Check Your Results<br />Anytime, Anywhere
                 </h2>
                 <p className="text-white/70 mb-8 leading-relaxed max-w-md" style={{ fontFamily: "'Inter',sans-serif" }}>
-                  Register as an Old Boy, network with thousands of fellow alumni, share your journey, and stay connected with the school that shaped your future.
+                  Sign in with your admission number to view and print your official term results, straight from the school's records office.
                 </p>
                 <div className="flex flex-wrap gap-4">
                   <button
-                    onClick={() => nav("alumni")}
+                    onClick={() => nav("portal")}
                     className="bg-accent text-white px-6 py-3 rounded-xl font-semibold text-sm hover:bg-accent/90 transition-all flex items-center gap-2 shadow-md"
                     style={{ fontFamily: "'Inter',sans-serif" }}
                   >
-                    Register Now <ArrowRight size={16} />
-                  </button>
-                  <button
-                    onClick={() => nav("alumni")}
-                    className="text-white px-6 py-3 rounded-xl font-semibold text-sm flex items-center gap-2 hover:-translate-y-0.5 transition-all"
-                    style={{ ...glass(0.12), fontFamily: "'Inter',sans-serif" }}
-                  >
-                    Sign In
+                    Sign In to Portal <ArrowRight size={16} />
                   </button>
                 </div>
               </div>
 
               <div className="hidden md:grid grid-cols-2 gap-4 p-10">
                 {[
-                  { val: "10,000+", label: "Registered Alumni" },
+                  { val: "2,400+",  label: "Active Students" },
                   { val: "58",      label: "Graduation Classes" },
-                  { val: "32",      label: "Countries" },
-                  { val: "500+",    label: "Active Members" },
+                  { val: "2",       label: "Terms Per Session" },
+                  { val: "24/7",    label: "Results Access" },
                 ].map((item, i) => (
                   <div key={i} className="p-5 rounded-2xl text-center" style={glass(0.1, 14)}>
                     <p className="text-3xl font-black text-accent" style={{ fontFamily: "'Poppins',sans-serif" }}>{item.val}</p>
@@ -543,6 +543,22 @@ function AcademicsPage({ setPage }: { setPage: (p: Page) => void }) {
       features: ["60 HP workstations", "Fiber-optic broadband", "Python & web development", "Networking administration"],
       img: IMGS.computer,
     },
+    {
+      icon: <BookOpen size={32} />,
+      name: "Literature & Languages Department",
+      head: "Mrs. Blessing Danjuma, B.A., PGDE",
+      desc: "Our Arts wing's flagship department cultivates strong readers, writers, and communicators through Literature-in-English, English Language, and Hausa Language tracks. Students build the analytical and rhetorical skills valued across law, media, and public service careers.",
+      features: ["Well-stocked school library", "Debate & literary society", "WAEC Literature specialists", "Creative writing workshops"],
+      img: IMGS.teaching,
+    },
+    {
+      icon: <Landmark size={32} />,
+      name: "Government & Social Studies Department",
+      head: "Mr. Yusuf Adamu, B.Sc. (Pol. Sci.)",
+      desc: "Covering Government, Economics, and CRS/IRS, this department prepares Arts-track students for careers in law, public administration, and the social sciences through case-study driven, discussion-based learning.",
+      features: ["Government & Economics", "CRS / IRS tracks", "Mock parliamentary debates", "Civic education projects"],
+      img: IMGS.campus2,
+    },
   ];
 
   return (
@@ -550,9 +566,9 @@ function AcademicsPage({ setPage }: { setPage: (p: Page) => void }) {
       {/* Header */}
       <div className="py-20 px-6 text-center" style={{ background: "linear-gradient(160deg, #0D3B6E 0%, #0a2e55 100%)" }}>
         <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-accent text-xs font-semibold uppercase tracking-wider mb-4" style={{ fontFamily: "'Inter',sans-serif" }}>Academics</span>
-        <h1 className="text-5xl md:text-6xl font-black text-white mb-4" style={{ fontFamily: "'Poppins',sans-serif" }}>Science Curriculum</h1>
+        <h1 className="text-5xl md:text-6xl font-black text-white mb-4" style={{ fontFamily: "'Poppins',sans-serif" }}>Science &amp; Arts Curriculum</h1>
         <p className="text-white/65 max-w-2xl mx-auto text-base" style={{ fontFamily: "'Inter',sans-serif" }}>
-          GSS Hong delivers a comprehensive, WAEC-aligned science education across four specialist departments, each led by experienced, qualified staff.
+          GSS Hong delivers a comprehensive, WAEC-aligned curriculum spanning both the Science and Arts tracks across six specialist departments, each led by experienced, qualified staff.
         </p>
       </div>
 
@@ -591,7 +607,7 @@ function AcademicsPage({ setPage }: { setPage: (p: Page) => void }) {
           94% WAEC Distinction Rate — 2025
         </h2>
         <p className="text-white/75 mb-8 max-w-xl mx-auto" style={{ fontFamily: "'Inter',sans-serif" }}>
-          Our students consistently exceed national averages in all science subjects, year after year.
+          Our students consistently exceed national averages in both Science and Arts subjects, year after year.
         </p>
         <button
           onClick={() => setPage("contact")}
@@ -605,20 +621,21 @@ function AcademicsPage({ setPage }: { setPage: (p: Page) => void }) {
   );
 }
 
-// ─── AlumniPage ───────────────────────────────────────────────────────────────
-function AlumniPage() {
-  const [tab, setTab] = useState<"register" | "login">("register");
+// ─── StudentPortalPage (login-only; registration lives at /register) ─────────
+function StudentPortalPage() {
   const [showPass, setShowPass] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", phone: "", year: "", state: "", occupation: "", password: "" });
-  const [submitted, setSubmitted] = useState(false);
-
-  const years = Array.from({ length: 59 }, (_, i) => 2025 - i);
+  const [form, setForm] = useState({ admissionNo: "", password: "" });
+  const [loggedIn, setLoggedIn] = useState(false);
 
   const inputClass = "w-full px-4 py-3 rounded-xl border border-border bg-white/70 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all placeholder:text-muted-foreground/55";
 
-  function handleSubmit(e: React.FormEvent) {
+  function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    setSubmitted(true);
+    setLoggedIn(true);
+  }
+
+  if (loggedIn) {
+    return <ResultsView admissionNo={form.admissionNo || "GSS/2024/00231"} onLogout={() => setLoggedIn(false)} />;
   }
 
   return (
@@ -632,153 +649,66 @@ function AlumniPage() {
         <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(13,59,110,0.6), rgba(13,59,110,0.8))" }} />
         <div className="relative z-10 text-center">
           <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-accent text-xs font-semibold uppercase tracking-wider mb-4" style={{ fontFamily: "'Inter',sans-serif" }}>
-            Old Boys Network
+            Results & Records
           </span>
-          <h1 className="text-5xl md:text-6xl font-black text-white mb-3" style={{ fontFamily: "'Poppins',sans-serif" }}>Alumni Portal</h1>
+          <h1 className="text-5xl md:text-6xl font-black text-white mb-3" style={{ fontFamily: "'Poppins',sans-serif" }}>Student Portal</h1>
           <p className="text-white/65 max-w-xl mx-auto" style={{ fontFamily: "'Inter',sans-serif" }}>
-            Register or sign in to connect with thousands of GSS Hong alumni from across Nigeria and the world.
+            Sign in with your admission number to view and print your official term results.
           </p>
         </div>
       </div>
 
-      {/* Forms */}
+      {/* Login form */}
       <section className="py-16 px-6" style={{ background: "linear-gradient(160deg, #EEF2F7 0%, #DCE9F5 100%)" }}>
-        <div className="max-w-5xl mx-auto grid md:grid-cols-[1fr_340px] gap-8 items-start">
+        <div className="max-w-4xl mx-auto grid md:grid-cols-[1fr_300px] gap-8 items-start">
 
-          {/* Main form panel */}
+          {/* Login panel */}
           <div
             className="p-8 rounded-3xl shadow-2xl"
             style={{ background: "rgba(255,255,255,0.65)", backdropFilter: "blur(28px)", WebkitBackdropFilter: "blur(28px)", border: "1px solid rgba(255,255,255,0.72)" }}
           >
-            {submitted ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 rounded-full bg-accent/15 flex items-center justify-center mx-auto mb-5">
-                  <GraduationCap size={32} className="text-accent" />
+            <h2 className="text-xl font-black text-primary mb-6" style={{ fontFamily: "'Poppins',sans-serif" }}>Sign In</h2>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-primary mb-1.5" style={{ fontFamily: "'Inter',sans-serif" }}>Admission Number</label>
+                <div className="relative">
+                  <IdCard size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    type="text"
+                    value={form.admissionNo}
+                    onChange={e => setForm({ ...form, admissionNo: e.target.value })}
+                    placeholder="e.g. GSS/2024/00231"
+                    className={inputClass + " pl-11"}
+                    required
+                  />
                 </div>
-                <h3 className="text-2xl font-black text-primary mb-2" style={{ fontFamily: "'Poppins',sans-serif" }}>
-                  {tab === "register" ? "Welcome to the Network!" : "Welcome Back!"}
-                </h3>
-                <p className="text-muted-foreground text-sm mb-6" style={{ fontFamily: "'Inter',sans-serif" }}>
-                  {tab === "register"
-                    ? "Your registration has been submitted. You'll receive a confirmation email within 24 hours."
-                    : "You have successfully signed in to the GSS Hong Alumni Portal."}
-                </p>
-                <button onClick={() => setSubmitted(false)} className="text-accent font-semibold text-sm hover:underline" style={{ fontFamily: "'Inter',sans-serif" }}>
-                  ← Back
-                </button>
               </div>
-            ) : (
-              <>
-                {/* Tab switcher */}
-                <div className="flex gap-2 mb-8 p-1 rounded-xl bg-primary/6 border border-primary/10">
-                  {(["register", "login"] as const).map(t => (
-                    <button
-                      key={t}
-                      onClick={() => setTab(t)}
-                      className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all ${tab === t ? "bg-primary text-white shadow-md" : "text-primary hover:bg-primary/10"}`}
-                      style={{ fontFamily: "'Inter',sans-serif" }}
-                    >
-                      {t === "register" ? "New Registration" : "Sign In"}
-                    </button>
-                  ))}
+              <div>
+                <label className="block text-sm font-semibold text-primary mb-1.5" style={{ fontFamily: "'Inter',sans-serif" }}>Password</label>
+                <div className="relative">
+                  <input
+                    type={showPass ? "text" : "password"}
+                    value={form.password}
+                    onChange={e => setForm({ ...form, password: e.target.value })}
+                    placeholder="Your password"
+                    className={inputClass + " pr-12"}
+                    required
+                  />
+                  <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-all">
+                    {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
-
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  {tab === "register" ? (
-                    <>
-                      <div className="grid sm:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-semibold text-primary mb-1.5" style={{ fontFamily: "'Inter',sans-serif" }}>Full Name *</label>
-                          <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Muhammad Aliyu" className={inputClass} required />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-semibold text-primary mb-1.5" style={{ fontFamily: "'Inter',sans-serif" }}>Email Address *</label>
-                          <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="you@example.com" className={inputClass} required />
-                        </div>
-                      </div>
-
-                      <div className="grid sm:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-semibold text-primary mb-1.5" style={{ fontFamily: "'Inter',sans-serif" }}>Phone Number</label>
-                          <input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+234 800 000 0000" className={inputClass} />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-semibold text-primary mb-1.5" style={{ fontFamily: "'Inter',sans-serif" }}>Graduation Class *</label>
-                          <select value={form.year} onChange={e => setForm({ ...form, year: e.target.value })} className={inputClass} required>
-                            <option value="">Class of ...</option>
-                            {years.map(y => (
-                              <option key={y} value={y}>Class of {y}</option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-
-                      <div className="grid sm:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-semibold text-primary mb-1.5" style={{ fontFamily: "'Inter',sans-serif" }}>State / Country</label>
-                          <input type="text" value={form.state} onChange={e => setForm({ ...form, state: e.target.value })} placeholder="e.g. Lagos, United Kingdom" className={inputClass} />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-semibold text-primary mb-1.5" style={{ fontFamily: "'Inter',sans-serif" }}>Occupation</label>
-                          <input type="text" value={form.occupation} onChange={e => setForm({ ...form, occupation: e.target.value })} placeholder="e.g. Medical Doctor" className={inputClass} />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-semibold text-primary mb-1.5" style={{ fontFamily: "'Inter',sans-serif" }}>Create Password *</label>
-                        <div className="relative">
-                          <input
-                            type={showPass ? "text" : "password"}
-                            value={form.password}
-                            onChange={e => setForm({ ...form, password: e.target.value })}
-                            placeholder="Minimum 8 characters"
-                            className={inputClass + " pr-12"}
-                            required
-                          />
-                          <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-all">
-                            {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
-                          </button>
-                        </div>
-                      </div>
-
-                      <button type="submit" className="w-full bg-primary text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-primary/90 transition-all shadow-md flex items-center justify-center gap-2 mt-2" style={{ fontFamily: "'Inter',sans-serif" }}>
-                        Register as Old Boy <ArrowRight size={18} />
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <div>
-                        <label className="block text-sm font-semibold text-primary mb-1.5" style={{ fontFamily: "'Inter',sans-serif" }}>Email Address</label>
-                        <input type="email" placeholder="you@example.com" className={inputClass} />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-primary mb-1.5" style={{ fontFamily: "'Inter',sans-serif" }}>Password</label>
-                        <div className="relative">
-                          <input
-                            type={showPass ? "text" : "password"}
-                            placeholder="Your password"
-                            className={inputClass + " pr-12"}
-                          />
-                          <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-all">
-                            {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
-                          </button>
-                        </div>
-                      </div>
-                      <div className="flex justify-end">
-                        <button type="button" className="text-xs text-accent hover:underline" style={{ fontFamily: "'Inter',sans-serif" }}>Forgot password?</button>
-                      </div>
-                      <button type="submit" className="w-full bg-primary text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-primary/90 transition-all shadow-md" style={{ fontFamily: "'Inter',sans-serif" }}>
-                        Sign In to Portal
-                      </button>
-                      <p className="text-center text-sm text-muted-foreground" style={{ fontFamily: "'Inter',sans-serif" }}>
-                        Not registered?{" "}
-                        <button type="button" onClick={() => setTab("register")} className="text-accent font-semibold hover:underline">Join the network</button>
-                      </p>
-                    </>
-                  )}
-                </form>
-              </>
-            )}
+              </div>
+              <div className="flex justify-end">
+                <button type="button" className="text-xs text-accent hover:underline" style={{ fontFamily: "'Inter',sans-serif" }}>Forgot password?</button>
+              </div>
+              <button type="submit" className="w-full bg-primary text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-primary/90 transition-all shadow-md flex items-center justify-center gap-2" style={{ fontFamily: "'Inter',sans-serif" }}>
+                Sign In to Portal <ArrowRight size={16} />
+              </button>
+              <p className="text-center text-xs text-muted-foreground" style={{ fontFamily: "'Inter',sans-serif" }}>
+                New student? Contact the ICT / Records office to get portal access.
+              </p>
+            </form>
           </div>
 
           {/* Glassmorphism side panel */}
@@ -795,16 +725,15 @@ function AlumniPage() {
             <div className="flex justify-center mb-6">
               <SchoolCrest size={66} />
             </div>
-            <h3 className="text-xl font-black text-center mb-1" style={{ fontFamily: "'Poppins',sans-serif" }}>Alumni Association</h3>
-            <p className="text-white/55 text-xs text-center mb-7" style={{ fontFamily: "'Inter',sans-serif" }}>GSS Hong Old Boys' Network · Est. 1985</p>
+            <h3 className="text-xl font-black text-center mb-1" style={{ fontFamily: "'Poppins',sans-serif" }}>Student Portal</h3>
+            <p className="text-white/55 text-xs text-center mb-7" style={{ fontFamily: "'Inter',sans-serif" }}>Results & Records Office</p>
 
             <div className="space-y-4">
               {[
-                { icon: <Users size={17} />,     text: "Connect with 10,000+ fellow Old Boys" },
-                { icon: <Globe size={17} />,     text: "Members across 32+ countries worldwide" },
-                { icon: <Calendar size={17} />,  text: "Exclusive events, dinners & reunions" },
-                { icon: <BookOpen size={17} />,  text: "Mentorship & scholarship opportunities" },
-                { icon: <Award size={17} />,     text: "Annual Distinguished Alumni Award" },
+                { icon: <GraduationCap size={17} />, text: "View term & session results" },
+                { icon: <Printer size={17} />,       text: "Print an official result slip" },
+                { icon: <Calendar size={17} />,      text: "Check term dates & school calendar" },
+                { icon: <Users size={17} />,         text: "Update contact details on file" },
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-3 text-sm">
                   <div className="text-accent flex-shrink-0">{item.icon}</div>
@@ -816,9 +745,206 @@ function AlumniPage() {
             <div className="mt-8 pt-6 border-t border-white/14">
               <p className="text-xs text-white/40 text-center" style={{ fontFamily: "'Inter',sans-serif" }}>
                 Need help? Contact us at<br />
-                <span className="text-accent">alumni@gsshong.edu.ng</span>
+                <span className="text-accent">results@gsshong.edu.ng</span>
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+// ─── ResultsView (printable term result) ─────────────────────────────────────
+function ResultsView({ admissionNo, onLogout }: { admissionNo: string; onLogout: () => void }) {
+  const student = { name: "Mustapha Sani", admissionNo, class: "SS2", session: "2025/2026", term: "First Term" };
+
+  const results = [
+    { subject: "English Language", ca: 28, exam: 58, total: 86, grade: "A1" },
+    { subject: "Mathematics", ca: 25, exam: 52, total: 77, grade: "B2" },
+    { subject: "Biology", ca: 27, exam: 55, total: 82, grade: "A1" },
+    { subject: "Chemistry", ca: 24, exam: 50, total: 74, grade: "B3" },
+    { subject: "Physics", ca: 22, exam: 48, total: 70, grade: "C4" },
+    { subject: "Government", ca: 26, exam: 54, total: 80, grade: "A1" },
+    { subject: "Economics", ca: 23, exam: 51, total: 74, grade: "B3" },
+    { subject: "Computer Studies", ca: 29, exam: 60, total: 89, grade: "A1" },
+  ];
+
+  const average = Math.round(results.reduce((sum, r) => sum + r.total, 0) / results.length);
+
+  return (
+    <div className="min-h-screen pt-24 pb-20 px-6 bg-background">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6 print:hidden">
+          <div>
+            <h1 className="text-2xl font-black text-primary" style={{ fontFamily: "'Poppins',sans-serif" }}>Your Result</h1>
+            <p className="text-muted-foreground text-sm" style={{ fontFamily: "'Inter',sans-serif" }}>{student.term} · {student.session}</p>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={() => window.print()}
+              className="bg-accent text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-accent/90 transition-all flex items-center gap-2 shadow-md"
+              style={{ fontFamily: "'Inter',sans-serif" }}
+            >
+              <Printer size={16} /> Print Result
+            </button>
+            <button
+              onClick={onLogout}
+              className="border border-border text-primary px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-primary/5 transition-all flex items-center gap-2"
+              style={{ fontFamily: "'Inter',sans-serif" }}
+            >
+              <LogOut size={16} /> Log Out
+            </button>
+          </div>
+        </div>
+
+        <div className="bg-card rounded-3xl p-8 shadow-xl border border-border">
+          <div className="flex items-center gap-3 mb-6 pb-6 border-b border-border">
+            <SchoolCrest size={52} />
+            <div>
+              <p className="font-black text-primary text-lg leading-tight" style={{ fontFamily: "'Poppins',sans-serif" }}>Government Secondary School, Hong</p>
+              <p className="text-muted-foreground text-xs" style={{ fontFamily: "'Inter',sans-serif" }}>Official Student Result Slip</p>
+            </div>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-3 mb-8 text-sm" style={{ fontFamily: "'Inter',sans-serif" }}>
+            <p><span className="text-muted-foreground">Name:</span> <span className="font-semibold text-foreground">{student.name}</span></p>
+            <p><span className="text-muted-foreground">Admission No:</span> <span className="font-semibold text-foreground">{student.admissionNo}</span></p>
+            <p><span className="text-muted-foreground">Class:</span> <span className="font-semibold text-foreground">{student.class}</span></p>
+            <p><span className="text-muted-foreground">Session / Term:</span> <span className="font-semibold text-foreground">{student.session} · {student.term}</span></p>
+          </div>
+
+          <table className="w-full text-sm mb-6" style={{ fontFamily: "'Inter',sans-serif" }}>
+            <thead>
+              <tr className="text-left text-muted-foreground border-b border-border">
+                <th className="py-2 pr-2">Subject</th>
+                <th className="py-2 px-2 text-center">C.A. (30)</th>
+                <th className="py-2 px-2 text-center">Exam (70)</th>
+                <th className="py-2 px-2 text-center">Total (100)</th>
+                <th className="py-2 pl-2 text-center">Grade</th>
+              </tr>
+            </thead>
+            <tbody>
+              {results.map(r => (
+                <tr key={r.subject} className="border-b border-border/60">
+                  <td className="py-2.5 pr-2 font-medium text-foreground">{r.subject}</td>
+                  <td className="py-2.5 px-2 text-center text-muted-foreground">{r.ca}</td>
+                  <td className="py-2.5 px-2 text-center text-muted-foreground">{r.exam}</td>
+                  <td className="py-2.5 px-2 text-center font-semibold text-foreground">{r.total}</td>
+                  <td className="py-2.5 pl-2 text-center">
+                    <span className="px-2 py-0.5 rounded-full bg-accent/10 text-accent text-xs font-semibold">{r.grade}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div className="flex items-center justify-between p-4 rounded-xl bg-primary/5">
+            <span className="font-semibold text-primary text-sm" style={{ fontFamily: "'Inter',sans-serif" }}>Term Average</span>
+            <span className="font-black text-primary text-lg" style={{ fontFamily: "'Poppins',sans-serif" }}>{average}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── RegisterPage (student portal registration — reachable only via /register) ─
+function RegisterPage() {
+  const [showPass, setShowPass] = useState(false);
+  const [form, setForm] = useState({ name: "", admissionNo: "", className: "", email: "", phone: "", password: "" });
+  const [submitted, setSubmitted] = useState(false);
+
+  const inputClass = "w-full px-4 py-3 rounded-xl border border-border bg-white/70 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all placeholder:text-muted-foreground/55";
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSubmitted(true);
+  }
+
+  return (
+    <div className="min-h-screen" style={{ fontFamily: "'Inter',sans-serif" }}>
+      <div className="relative py-16 px-6" style={{ background: "linear-gradient(160deg, #0D3B6E 0%, #0a2e55 100%)" }}>
+        <div className="relative z-10 text-center">
+          <div className="flex justify-center mb-5">
+            <SchoolCrest size={56} />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black text-white mb-2" style={{ fontFamily: "'Poppins',sans-serif" }}>Portal Registration</h1>
+          <p className="text-white/65 max-w-xl mx-auto text-sm">
+            Register for Student Portal access. Your details will be verified against school records before activation.
+          </p>
+        </div>
+      </div>
+
+      <section className="py-16 px-6" style={{ background: "linear-gradient(160deg, #EEF2F7 0%, #DCE9F5 100%)" }}>
+        <div className="max-w-xl mx-auto">
+          <div
+            className="p-8 rounded-3xl shadow-2xl"
+            style={{ background: "rgba(255,255,255,0.65)", backdropFilter: "blur(28px)", WebkitBackdropFilter: "blur(28px)", border: "1px solid rgba(255,255,255,0.72)" }}
+          >
+            {submitted ? (
+              <div className="text-center py-10">
+                <div className="w-16 h-16 rounded-full bg-accent/15 flex items-center justify-center mx-auto mb-5">
+                  <GraduationCap size={32} className="text-accent" />
+                </div>
+                <h3 className="text-2xl font-black text-primary mb-2" style={{ fontFamily: "'Poppins',sans-serif" }}>Registration Submitted</h3>
+                <p className="text-muted-foreground text-sm mb-6">
+                  Your request has been sent to the Records office for verification. You'll be notified once your portal access is active.
+                </p>
+                <Link href="/" className="text-accent font-semibold text-sm hover:underline">
+                  ← Back to Student Portal
+                </Link>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-primary mb-1.5">Full Name *</label>
+                  <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Mustapha Sani" className={inputClass} required />
+                </div>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-primary mb-1.5">Admission Number *</label>
+                    <input type="text" value={form.admissionNo} onChange={e => setForm({ ...form, admissionNo: e.target.value })} placeholder="e.g. GSS/2024/00231" className={inputClass} required />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-primary mb-1.5">Class *</label>
+                    <input type="text" value={form.className} onChange={e => setForm({ ...form, className: e.target.value })} placeholder="e.g. SS2 Science" className={inputClass} required />
+                  </div>
+                </div>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-primary mb-1.5">Parent/Guardian Email *</label>
+                    <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="you@example.com" className={inputClass} required />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-primary mb-1.5">Phone Number *</label>
+                    <input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+234 800 000 0000" className={inputClass} required />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-primary mb-1.5">Create Password *</label>
+                  <div className="relative">
+                    <input
+                      type={showPass ? "text" : "password"}
+                      value={form.password}
+                      onChange={e => setForm({ ...form, password: e.target.value })}
+                      placeholder="Minimum 8 characters"
+                      className={inputClass + " pr-12"}
+                      required
+                    />
+                    <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-all">
+                      {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                </div>
+                <button type="submit" className="w-full bg-primary text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-primary/90 transition-all shadow-md flex items-center justify-center gap-2 mt-2">
+                  Submit Registration <ArrowRight size={18} />
+                </button>
+                <p className="text-center text-sm text-muted-foreground">
+                  Already registered? <Link href="/" className="text-accent font-semibold hover:underline">Sign in to the portal</Link>
+                </p>
+              </form>
+            )}
           </div>
         </div>
       </section>
@@ -950,7 +1076,7 @@ function ContactPage() {
   const contactInfo = [
     { icon: <MapPin size={22} />, label: "Address",    value: "Government Secondary School\nHong, Adamawa State, Nigeria" },
     { icon: <Phone size={22} />,  label: "Phone",      value: "+234 803 000 0123\n+234 806 000 0456" },
-    { icon: <Mail size={22} />,   label: "Email",      value: "info@gsshong.edu.ng\nalumni@gsshong.edu.ng" },
+    { icon: <Mail size={22} />,   label: "Email",      value: "info@gsshong.edu.ng\nresults@gsshong.edu.ng" },
   ];
 
   const inputClass = "w-full px-4 py-3 rounded-xl border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all placeholder:text-muted-foreground/55";
@@ -961,7 +1087,7 @@ function ContactPage() {
         <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-accent text-xs font-semibold uppercase tracking-wider mb-4" style={{ fontFamily: "'Inter',sans-serif" }}>Get In Touch</span>
         <h1 className="text-5xl md:text-6xl font-black text-white mb-3" style={{ fontFamily: "'Poppins',sans-serif" }}>Contact Us</h1>
         <p className="text-white/60 max-w-lg mx-auto" style={{ fontFamily: "'Inter',sans-serif" }}>
-          Reach out for admissions enquiries, alumni affairs, academic information, or general correspondence.
+          Reach out for admissions enquiries, student portal support, academic information, or general correspondence.
         </p>
       </div>
 
@@ -1075,15 +1201,15 @@ function ContactPage() {
   );
 }
 
-// ─── App ──────────────────────────────────────────────────────────────────────
-export default function App() {
+// ─── MainSite (all pages except the hidden /register route) ──────────────────
+function MainSite() {
   const [page, setPage] = useState<Page>("home");
 
   const renderPage = () => {
     switch (page) {
       case "home":      return <HomePage setPage={setPage} />;
       case "academics": return <AcademicsPage setPage={setPage} />;
-      case "alumni":    return <AlumniPage />;
+      case "portal":    return <StudentPortalPage />;
       case "news":      return <NewsPage />;
       case "contact":   return <ContactPage />;
     }
@@ -1095,5 +1221,19 @@ export default function App() {
       <main>{renderPage()}</main>
       <Footer setPage={setPage} />
     </div>
+  );
+}
+
+// ─── App ──────────────────────────────────────────────────────────────────────
+// Registration is intentionally not linked from anywhere in the visible UI —
+// it is only reachable by navigating directly to /register.
+export default function App() {
+  return (
+    <Switch>
+      <Route path="/register" component={RegisterPage} />
+      <Route>
+        <MainSite />
+      </Route>
+    </Switch>
   );
 }
