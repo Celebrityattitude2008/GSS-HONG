@@ -4,11 +4,12 @@ import {
   Menu, X, GraduationCap, FlaskConical, BookOpen, Users, Phone,
   Mail, MapPin, ArrowRight, Calendar, Microscope, Award, Send,
   Atom, Eye, EyeOff, ChevronRight, Cpu, Landmark, Printer,
-  LogOut, IdCard,
+  LogOut, IdCard, Linkedin, Github, Code2, ShieldCheck, Terminal,
 } from "lucide-react";
+import developerPhoto from "./assets/paul-adamu.jpg";
 
 // ─── Page type ────────────────────────────────────────────────────────────────
-type Page = "home" | "academics" | "portal" | "news" | "contact";
+type Page = "home" | "academics" | "portal" | "news" | "contact" | "developer";
 
 // ─── Image URLs ───────────────────────────────────────────────────────────────
 const IMGS = {
@@ -128,6 +129,9 @@ function Navbar({ page, setPage }: { page: Page; setPage: (p: Page) => void }) {
             <button onClick={() => nav("portal")} className="mt-1 bg-accent text-white py-2.5 rounded-xl text-sm font-semibold" style={{ fontFamily: "'Inter',sans-serif" }}>
               Portal Login
             </button>
+            <button onClick={() => nav("developer")} className="text-primary/70 text-xs font-medium text-left hover:text-primary transition-all" style={{ fontFamily: "'Inter',sans-serif" }}>
+              About the Developer
+            </button>
           </div>
         )}
       </div>
@@ -164,6 +168,7 @@ function Footer({ setPage }: { setPage: (p: Page) => void }) {
               { label: "Student Portal",page: "portal"    as Page },
               { label: "News",          page: "news"      as Page },
               { label: "Contact",       page: "contact"   as Page },
+              { label: "About the Developer", page: "developer" as Page },
             ],
           },
           {
@@ -341,7 +346,7 @@ function HomePage({ setPage }: { setPage: (p: Page) => void }) {
               A Legacy of<br />Academic Excellence
             </h2>
             <p className="text-muted-foreground leading-relaxed mb-4 text-base" style={{ fontFamily: "'Inter',sans-serif" }}>
-              Government Secondary School, Hong has stood as a beacon of quality education in Adamawa State since its founding in 1967. Built on a foundation of scientific inquiry and moral discipline, the school has produced thousands of graduates who have gone on to distinguish themselves in medicine, engineering, research, and public service across Nigeria and beyond.
+              Government Secondary School, Hong traces its origin to the Hong Secondary School, founded in January 1967 by the Danish Branch of the Sudan United Mission. On 30th March 1971, the school was presented as a gift from the Government of Denmark to the Government of Nigeria and renamed Government Secondary School, Hong. It operated as a conventional secondary school until 1983, when the then Gongola State Government converted it — alongside a handful of others — into a Science Secondary School as part of its drive to promote science education. Today, the school has grown to offer both Science and Arts tracks, and has produced thousands of graduates who have gone on to distinguish themselves in medicine, engineering, law, the arts, and public service across Nigeria and beyond.
             </p>
             <p className="text-muted-foreground leading-relaxed mb-8 text-base" style={{ fontFamily: "'Inter',sans-serif" }}>
               With a dedicated faculty of over 85 teachers, modern laboratory and classroom infrastructure, and a rigorous WAEC/NECO-aligned curriculum spanning both Science and Arts, GSS Hong consistently ranks among the foremost secondary schools in Northeastern Nigeria.
@@ -1201,6 +1206,115 @@ function ContactPage() {
   );
 }
 
+// ─── DeveloperPage ────────────────────────────────────────────────────────────
+function DeveloperPage() {
+  const stack = [
+    { icon: <Code2 size={18} />,       label: "Web Development", detail: "Next.js, React, Tailwind CSS" },
+    { icon: <Terminal size={18} />,    label: "Systems & Backend", detail: "Golang, C++, Vite.js" },
+    { icon: <ShieldCheck size={18} />, label: "Security Research", detail: "Offensive security, reverse engineering" },
+  ];
+
+  const highlights = [
+    "Computer Science student at Benson Idahosa University",
+    "Founder of ZeroTrace Intelligence, a security-tools venture built from the ground up",
+    "Builds under the handle PA_ZTI — a tech-driven builder from Adamawa State, Nigeria",
+    "2+ years of hands-on experience across web development and low-level programming",
+  ];
+
+  return (
+    <div className="pt-20 min-h-screen bg-background">
+      {/* Header */}
+      <div className="py-20 px-6 text-center relative overflow-hidden" style={{ background: "linear-gradient(160deg, #0D3B6E 0%, #0a2e55 100%)" }}>
+        <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-accent text-xs font-semibold uppercase tracking-wider mb-4" style={{ fontFamily: "'Inter',sans-serif" }}>
+          The Team Behind This Site
+        </span>
+        <h1 className="text-5xl md:text-6xl font-black text-white mb-4" style={{ fontFamily: "'Poppins',sans-serif" }}>About the Developer</h1>
+        <p className="text-white/65 max-w-xl mx-auto text-base" style={{ fontFamily: "'Inter',sans-serif" }}>
+          The person who designed and built the GSS Hong website.
+        </p>
+      </div>
+
+      {/* Profile */}
+      <section className="py-20 px-6" style={{ background: "linear-gradient(160deg, #EEF2F7 0%, #DCE9F5 100%)" }}>
+        <div className="max-w-4xl mx-auto grid md:grid-cols-[auto_1fr] gap-10 items-start">
+          <div className="flex flex-col items-center md:items-start">
+            <div
+              className="w-44 h-44 rounded-full overflow-hidden flex-shrink-0 shadow-2xl"
+              style={{ border: "5px solid white", boxShadow: "0 20px 50px rgba(13,59,110,0.25)" }}
+            >
+              <img src={developerPhoto} alt="Paul Adamu, developer of the GSS Hong website" className="w-full h-full object-cover" />
+            </div>
+            <div className="flex gap-3 mt-6">
+              <a
+                href="https://www.linkedin.com/in/paul-adamu-67bb46324"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary/85 transition-all shadow-md"
+                aria-label="Paul Adamu on LinkedIn"
+              >
+                <Linkedin size={18} />
+              </a>
+              <a
+                href="https://github.com/0x-ZeroTrace"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary/85 transition-all shadow-md"
+                aria-label="Paul Adamu on GitHub"
+              >
+                <Github size={18} />
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-3xl font-black text-primary mb-1" style={{ fontFamily: "'Poppins',sans-serif" }}>Paul Adamu</h2>
+            <p className="text-accent font-semibold text-sm mb-1" style={{ fontFamily: "'Inter',sans-serif" }}>Web Developer · Founder of ZeroTrace Intelligence</p>
+            <p className="text-muted-foreground text-sm mb-6 flex items-center gap-1.5" style={{ fontFamily: "'Inter',sans-serif" }}>
+              <MapPin size={14} /> Adamawa State, Nigeria
+            </p>
+
+            <p className="text-foreground/80 leading-relaxed mb-6" style={{ fontFamily: "'Inter',sans-serif" }}>
+              Known online as <span className="font-semibold text-primary">PA_ZTI</span>, Paul is a tech-driven builder and Computer Science
+              student at Benson Idahosa University. Alongside his studies, he founded{" "}
+              <span className="font-semibold text-primary">ZeroTrace Intelligence</span>, a venture building security-testing tools and
+              hardware for researchers. He designed and developed this GSS Hong website — from the visual identity to the Student Portal.
+            </p>
+
+            <div className="space-y-2.5 mb-8">
+              {highlights.map((h, i) => (
+                <div key={i} className="flex items-start gap-2.5 text-sm">
+                  <ChevronRight size={16} className="text-accent flex-shrink-0 mt-0.5" />
+                  <span className="text-foreground/75" style={{ fontFamily: "'Inter',sans-serif" }}>{h}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="grid sm:grid-cols-3 gap-3">
+              {stack.map((s, i) => (
+                <div key={i} className="p-4 rounded-2xl bg-card border border-border">
+                  <div className="text-accent mb-2">{s.icon}</div>
+                  <p className="font-semibold text-primary text-sm mb-0.5" style={{ fontFamily: "'Inter',sans-serif" }}>{s.label}</p>
+                  <p className="text-muted-foreground text-xs" style={{ fontFamily: "'Inter',sans-serif" }}>{s.detail}</p>
+                </div>
+              ))}
+            </div>
+
+            <a
+              href="https://www.linkedin.com/in/paul-adamu-67bb46324"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 mt-8 bg-primary text-white px-6 py-3 rounded-xl font-semibold text-sm hover:bg-primary/90 transition-all shadow-md"
+              style={{ fontFamily: "'Inter',sans-serif" }}
+            >
+              Connect on LinkedIn <ArrowRight size={16} />
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 // ─── MainSite (all pages except the hidden /register route) ──────────────────
 function MainSite() {
   const [page, setPage] = useState<Page>("home");
@@ -1212,6 +1326,7 @@ function MainSite() {
       case "portal":    return <StudentPortalPage />;
       case "news":      return <NewsPage />;
       case "contact":   return <ContactPage />;
+      case "developer": return <DeveloperPage />;
     }
   };
 
