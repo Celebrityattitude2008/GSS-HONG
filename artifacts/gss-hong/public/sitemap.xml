@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+>
+  <!-- Home / About -->
+  <url>
+    <loc>https://gsshong.edu.ng/</loc>
+    <lastmod>2025-07-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en-NG" href="https://gsshong.edu.ng/" />
+    <image:image>
+      <image:loc>https://gsshong.edu.ng/og-image.png</image:loc>
+      <image:title>Government Secondary School Hong — Official Website</image:title>
+    </image:image>
+  </url>
+
+  <!-- Academics -->
+  <url>
+    <loc>https://gsshong.edu.ng/#academics</loc>
+    <lastmod>2025-07-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Student Portal (login only, not indexed) -->
+  <url>
+    <loc>https://gsshong.edu.ng/#portal</loc>
+    <lastmod>2025-07-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- News -->
+  <url>
+    <loc>https://gsshong.edu.ng/#news</loc>
+    <lastmod>2025-07-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Contact -->
+  <url>
+    <loc>https://gsshong.edu.ng/#contact</loc>
+    <lastmod>2025-07-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- About the Developer -->
+  <url>
+    <loc>https://gsshong.edu.ng/#developer</loc>
+    <lastmod>2025-07-10</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+</urlset>

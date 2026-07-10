@@ -26,9 +26,17 @@ Official web portal for Government Secondary School, Hong (Adamawa State, Nigeri
 
 ## Where things live
 
-- `artifacts/gss-hong/src/App.tsx` — entire site (Home/Academics/Alumni/News/Contact), paged via internal `useState`, not a router
+- `artifacts/gss-hong/src/App.tsx` — entire site (Home/Academics/Portal/News/Contact/Developer), paged via `useState` + `wouter` for hidden routes
 - `artifacts/gss-hong/src/lib/firebase.ts` — Firebase app initialization
+- `artifacts/gss-hong/src/lib/portal.ts` — all portal logic: auth, Firestore, WAEC grading, admin ops
+- `artifacts/gss-hong/src/pages/AdminPage.tsx` — admin portal UI (hidden route `/admin`)
 - `artifacts/gss-hong/src/index.css` — Tailwind v4 theme tokens (HSL triplets, light + dark)
+- `artifacts/gss-hong/index.html` — SEO: full meta, OG, Twitter Card, schema.org JSON-LD, PWA manifest link
+- `artifacts/gss-hong/public/` — robots.txt, sitemap.xml, manifest.json, favicon.svg, og-image.svg
+- `firestore.rules` — Firestore security rules (paste into Firebase console → Firestore → Rules)
+- `docs/FIREBASE_SETUP.md` — step-by-step Firebase configuration guide
+- `docs/ADMIN_GUIDE.md` — admin portal user guide for school staff
+- `docs/STUDENT_PORTAL.md` — student portal user guide
 
 ## Architecture decisions
 

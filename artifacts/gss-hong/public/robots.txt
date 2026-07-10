@@ -1,2 +1,16 @@
 User-agent: *
 Allow: /
+
+# Block hidden staff-only routes from search engines
+Disallow: /admin
+Disallow: /register
+
+# Block crawling of API or dev assets
+Disallow: /src/
+Disallow: /node_modules/
+
+# Sitemaps
+Sitemap: https://gsshong.edu.ng/sitemap.xml
+
+# Crawl delay (be kind to the server)
+Crawl-delay: 5

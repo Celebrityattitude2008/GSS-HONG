@@ -1,0 +1,63 @@
+{
+  "name": "GSS Hong — Government Secondary School",
+  "short_name": "GSS Hong",
+  "description": "Official web portal of Government Secondary School, Hong, Adamawa State, Nigeria. View results, news, academics, and contact information.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0D3B6E",
+  "theme_color": "#0D3B6E",
+  "lang": "en-NG",
+  "orientation": "portrait-primary",
+  "categories": ["education", "government"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon-96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "apple touch icon"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/og-image.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "GSS Hong home page"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Student Portal",
+      "short_name": "Portal",
+      "description": "Sign in to view your term results",
+      "url": "/#portal",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Academics",
+      "short_name": "Academics",
+      "description": "View our academic programmes",
+      "url": "/#academics",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Contact Us",
+      "short_name": "Contact",
+      "description": "Get in touch with the school",
+      "url": "/#contact",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    }
+  ]
+}
