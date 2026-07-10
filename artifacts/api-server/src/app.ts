@@ -1,6 +1,6 @@
 import express, { type Express } from "express";
 import cors from "cors";
-import pinoHttp from "pino-http";
+import { pinoHttp } from "pino-http"; // Fixed: Added curly braces to fix TS2349
 import router from "./routes";
 import { logger } from "./lib/logger";
 
@@ -10,14 +10,16 @@ app.use(
   pinoHttp({
     logger,
     serializers: {
-      req(req) {
+      // Fixed: Explicitly typed 'req' to fix TS7006
+      req(req: any) {
         return {
           id: req.id,
           method: req.method,
           url: req.url?.split("?")[0],
         };
       },
-      res(res) {
+      // Fixed: Explicitly typed 'res' to fix TS7006
+      res(res: any) {
         return {
           statusCode: res.statusCode,
         };
