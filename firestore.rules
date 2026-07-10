@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper: is the current caller an admin? ────────────────────────────────
+    function isAdmin() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // ── Admins collection ─────────────────────────────────────────────────────
+    // Admins can only read their own doc (used to verify admin status).
+    // No client can write — admin docs are created manually in Firebase console.
+    match /admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // ── Students collection ───────────────────────────────────────────────────
+    match /students/{studentId} {
+      // A student can read their own doc; admins can read all.
+      allow read: if request.auth != null &&
+        (resource.data.uid == request.auth.uid || isAdmin());
+
+      // Registration: create only if the uid in the new doc matches the caller.
+      allow create: if request.auth != null &&
+        request.resource.data.uid == request.auth.uid;
+
+      // Update (e.g. profile changes): own doc or admin.
+      allow update: if request.auth != null &&
+        (resource.data.uid == request.auth.uid || isAdmin());
+
+      // Delete: admin only.
+      allow delete: if isAdmin();
+
+      // ── Results subcollection ──────────────────────────────────────────────
+      match /results/{resultId} {
+        // Student reads own released results; admins read everything.
+        allow read: if request.auth != null && (
+          (resource.data.released == true &&
+           get(/databases/$(database)/documents/students/$(studentId)).data.uid == request.auth.uid)
+          || isAdmin()
+        );
+
+        // Only admins may write results.
+        allow write: if isAdmin();
+      }
+    }
+  }
+}

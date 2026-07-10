@@ -12,6 +12,7 @@ import {
   LogOut, IdCard, Linkedin, Github, Code2, ShieldCheck, Terminal,
 } from "lucide-react";
 import developerPhoto from "./assets/paul-adamu.jpg";
+import AdminPage from "./pages/AdminPage";
 
 // ─── Page type ────────────────────────────────────────────────────────────────
 type Page = "home" | "academics" | "portal" | "news" | "contact" | "developer";
@@ -1507,12 +1508,13 @@ function MainSite() {
 }
 
 // ─── App ──────────────────────────────────────────────────────────────────────
-// Registration is intentionally not linked from anywhere in the visible UI —
-// it is only reachable by navigating directly to /register.
+// /register and /admin are intentionally not linked from the visible UI —
+// they are only reachable by navigating directly to those paths.
 export default function App() {
   return (
     <Switch>
       <Route path="/register" component={RegisterPage} />
+      <Route path="/admin" component={AdminPage} />
       <Route>
         <MainSite />
       </Route>
