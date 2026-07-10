@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "corepack enable && pnpm install --frozen-lockfile && pnpm --filter @workspace/gss-hong run build",
+  "outputDirectory": "artifacts/gss-hong/dist/public",
+  "installCommand": "corepack enable && pnpm install --frozen-lockfile",
+  "framework": null,
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
