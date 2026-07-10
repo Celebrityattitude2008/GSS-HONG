@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { Switch, Route, Link } from "wouter";
 import {
+  registerStudent, loginStudent, fetchStudentResults,
+  changeStudentPassword, logoutStudent, DEFAULT_PASSWORD,
+  type StudentProfile, type TermResult,
+} from "./lib/portal";
+import {
   Menu, X, GraduationCap, FlaskConical, BookOpen, Users, Phone,
   Mail, MapPin, ArrowRight, Calendar, Microscope, Award, Send,
   Atom, Eye, EyeOff, ChevronRight, Cpu, Landmark, Printer,
@@ -630,17 +635,38 @@ function AcademicsPage({ setPage }: { setPage: (p: Page) => void }) {
 function StudentPortalPage() {
   const [showPass, setShowPass] = useState(false);
   const [form, setForm] = useState({ admissionNo: "", password: "" });
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [profile, setProfile] = useState<StudentProfile | null>(null);
+  const [results, setResults] = useState<TermResult[]>([]);
 
   const inputClass = "w-full px-4 py-3 rounded-xl border border-border bg-white/70 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all placeholder:text-muted-foreground/55";
 
-  function handleLogin(e: React.FormEvent) {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    setLoggedIn(true);
+    setError("");
+    setLoading(true);
+    const res = await loginStudent(form.admissionNo, form.password);
+    if (!res.ok) {
+      setError(res.error);
+      setLoading(false);
+      return;
+    }
+    const termResults = await fetchStudentResults(form.admissionNo);
+    setResults(termResults);
+    setProfile(res.profile);
+    setLoading(false);
   }
 
-  if (loggedIn) {
-    return <ResultsView admissionNo={form.admissionNo || "GSS/2024/00231"} onLogout={() => setLoggedIn(false)} />;
+  async function handleLogout() {
+    await logoutStudent();
+    setProfile(null);
+    setResults([]);
+    setForm({ admissionNo: "", password: "" });
+  }
+
+  if (profile) {
+    return <ResultsView profile={profile} results={results} onLogout={handleLogout} />;
   }
 
   return (
@@ -685,6 +711,7 @@ function StudentPortalPage() {
                     placeholder="e.g. GSS/2024/00231"
                     className={inputClass + " pl-11"}
                     required
+                    disabled={loading}
                   />
                 </div>
               </div>
@@ -698,20 +725,28 @@ function StudentPortalPage() {
                     placeholder="Your password"
                     className={inputClass + " pr-12"}
                     required
+                    disabled={loading}
                   />
                   <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-all">
                     {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
               </div>
-              <div className="flex justify-end">
-                <button type="button" className="text-xs text-accent hover:underline" style={{ fontFamily: "'Inter',sans-serif" }}>Forgot password?</button>
-              </div>
-              <button type="submit" className="w-full bg-primary text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-primary/90 transition-all shadow-md flex items-center justify-center gap-2" style={{ fontFamily: "'Inter',sans-serif" }}>
-                Sign In to Portal <ArrowRight size={16} />
+              {error && (
+                <p className="text-red-600 text-xs font-medium bg-red-50 border border-red-200 rounded-lg px-3 py-2" style={{ fontFamily: "'Inter',sans-serif" }}>
+                  {error}
+                </p>
+              )}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-primary text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-primary/90 transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{ fontFamily: "'Inter',sans-serif" }}
+              >
+                {loading ? "Signing in…" : <><span>Sign In to Portal</span><ArrowRight size={16} /></>}
               </button>
               <p className="text-center text-xs text-muted-foreground" style={{ fontFamily: "'Inter',sans-serif" }}>
-                New student? Contact the ICT / Records office to get portal access.
+                First time? Your default password is <span className="font-semibold text-primary">{DEFAULT_PASSWORD}</span>. Change it after signing in.
               </p>
             </form>
           </div>
@@ -760,38 +795,77 @@ function StudentPortalPage() {
   );
 }
 
-// ─── ResultsView (printable term result) ─────────────────────────────────────
-function ResultsView({ admissionNo, onLogout }: { admissionNo: string; onLogout: () => void }) {
-  const student = { name: "Mustapha Sani", admissionNo, class: "SS2", session: "2025/2026", term: "First Term" };
+// ─── ResultsView (printable term result — Firebase-backed, no seed data) ──────
+function ResultsView({
+  profile, results, onLogout,
+}: {
+  profile: StudentProfile;
+  results: TermResult[];
+  onLogout: () => void;
+}) {
+  const [termIdx, setTermIdx] = useState(0);
+  const [showChangePw, setShowChangePw] = useState(false);
+  const [pwForm, setPwForm] = useState({ newPw: "", confirm: "" });
+  const [pwShowNew, setPwShowNew] = useState(false);
+  const [pwMsg, setPwMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [pwLoading, setPwLoading] = useState(false);
 
-  const results = [
-    { subject: "English Language", ca: 28, exam: 58, total: 86, grade: "A1" },
-    { subject: "Mathematics", ca: 25, exam: 52, total: 77, grade: "B2" },
-    { subject: "Biology", ca: 27, exam: 55, total: 82, grade: "A1" },
-    { subject: "Chemistry", ca: 24, exam: 50, total: 74, grade: "B3" },
-    { subject: "Physics", ca: 22, exam: 48, total: 70, grade: "C4" },
-    { subject: "Government", ca: 26, exam: 54, total: 80, grade: "A1" },
-    { subject: "Economics", ca: 23, exam: 51, total: 74, grade: "B3" },
-    { subject: "Computer Studies", ca: 29, exam: 60, total: 89, grade: "A1" },
-  ];
+  const inputClass = "w-full px-4 py-3 rounded-xl border border-border bg-white/70 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all placeholder:text-muted-foreground/55";
 
-  const average = Math.round(results.reduce((sum, r) => sum + r.total, 0) / results.length);
+  async function handleChangePw(e: React.FormEvent) {
+    e.preventDefault();
+    setPwMsg(null);
+    if (pwForm.newPw !== pwForm.confirm) {
+      setPwMsg({ ok: false, text: "Passwords do not match." });
+      return;
+    }
+    if (pwForm.newPw.length < 6) {
+      setPwMsg({ ok: false, text: "Password must be at least 6 characters." });
+      return;
+    }
+    setPwLoading(true);
+    const res = await changeStudentPassword(pwForm.newPw);
+    setPwLoading(false);
+    if (res.ok) {
+      setPwMsg({ ok: true, text: "Password updated successfully!" });
+      setPwForm({ newPw: "", confirm: "" });
+    } else {
+      setPwMsg({ ok: false, text: res.error });
+    }
+  }
+
+  const current = results[termIdx] ?? null;
 
   return (
     <div className="min-h-screen pt-24 pb-20 px-6 bg-background">
       <div className="max-w-4xl mx-auto">
+
+        {/* Top bar */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6 print:hidden">
           <div>
-            <h1 className="text-2xl font-black text-primary" style={{ fontFamily: "'Poppins',sans-serif" }}>Your Result</h1>
-            <p className="text-muted-foreground text-sm" style={{ fontFamily: "'Inter',sans-serif" }}>{student.term} · {student.session}</p>
+            <h1 className="text-2xl font-black text-primary" style={{ fontFamily: "'Poppins',sans-serif" }}>
+              {current ? `${current.term} · ${current.session}` : "Student Portal"}
+            </h1>
+            <p className="text-muted-foreground text-sm" style={{ fontFamily: "'Inter',sans-serif" }}>
+              Welcome, {profile.name}
+            </p>
           </div>
           <div className="flex gap-3">
+            {current && (
+              <button
+                onClick={() => window.print()}
+                className="bg-accent text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-accent/90 transition-all flex items-center gap-2 shadow-md"
+                style={{ fontFamily: "'Inter',sans-serif" }}
+              >
+                <Printer size={16} /> Print Result
+              </button>
+            )}
             <button
-              onClick={() => window.print()}
-              className="bg-accent text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-accent/90 transition-all flex items-center gap-2 shadow-md"
+              onClick={() => { setShowChangePw(v => !v); setPwMsg(null); }}
+              className="border border-border text-primary px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-primary/5 transition-all"
               style={{ fontFamily: "'Inter',sans-serif" }}
             >
-              <Printer size={16} /> Print Result
+              Change Password
             </button>
             <button
               onClick={onLogout}
@@ -803,52 +877,131 @@ function ResultsView({ admissionNo, onLogout }: { admissionNo: string; onLogout:
           </div>
         </div>
 
-        <div className="bg-card rounded-3xl p-8 shadow-xl border border-border">
-          <div className="flex items-center gap-3 mb-6 pb-6 border-b border-border">
-            <SchoolCrest size={52} />
-            <div>
-              <p className="font-black text-primary text-lg leading-tight" style={{ fontFamily: "'Poppins',sans-serif" }}>Government Secondary School, Hong</p>
-              <p className="text-muted-foreground text-xs" style={{ fontFamily: "'Inter',sans-serif" }}>Official Student Result Slip</p>
+        {/* Change-password panel */}
+        {showChangePw && (
+          <div className="mb-6 p-6 bg-card rounded-2xl border border-border shadow-md print:hidden">
+            <h3 className="font-black text-primary mb-4 text-base" style={{ fontFamily: "'Poppins',sans-serif" }}>Change Password</h3>
+            <form onSubmit={handleChangePw} className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-primary mb-1.5" style={{ fontFamily: "'Inter',sans-serif" }}>New Password</label>
+                <div className="relative">
+                  <input
+                    type={pwShowNew ? "text" : "password"}
+                    value={pwForm.newPw}
+                    onChange={e => setPwForm(f => ({ ...f, newPw: e.target.value }))}
+                    placeholder="Min. 6 characters"
+                    className={inputClass + " pr-12"}
+                    required
+                  />
+                  <button type="button" onClick={() => setPwShowNew(v => !v)} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    {pwShowNew ? <EyeOff size={17} /> : <Eye size={17} />}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-primary mb-1.5" style={{ fontFamily: "'Inter',sans-serif" }}>Confirm Password</label>
+                <input
+                  type="password"
+                  value={pwForm.confirm}
+                  onChange={e => setPwForm(f => ({ ...f, confirm: e.target.value }))}
+                  placeholder="Repeat new password"
+                  className={inputClass}
+                  required
+                />
+              </div>
+              <div className="sm:col-span-2 flex items-center gap-4">
+                <button
+                  type="submit"
+                  disabled={pwLoading}
+                  className="bg-primary text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all disabled:opacity-60"
+                  style={{ fontFamily: "'Inter',sans-serif" }}
+                >
+                  {pwLoading ? "Updating…" : "Update Password"}
+                </button>
+                {pwMsg && (
+                  <p className={`text-sm font-medium ${pwMsg.ok ? "text-green-600" : "text-red-600"}`} style={{ fontFamily: "'Inter',sans-serif" }}>
+                    {pwMsg.text}
+                  </p>
+                )}
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* Term selector */}
+        {results.length > 1 && (
+          <div className="flex gap-2 mb-6 flex-wrap print:hidden">
+            {results.map((r, i) => (
+              <button
+                key={r.id}
+                onClick={() => setTermIdx(i)}
+                className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${i === termIdx ? "bg-primary text-white border-primary" : "border-border text-primary hover:bg-primary/5"}`}
+                style={{ fontFamily: "'Inter',sans-serif" }}
+              >
+                {r.term} · {r.session}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Result card */}
+        {current ? (
+          <div className="bg-card rounded-3xl p-8 shadow-xl border border-border">
+            <div className="flex items-center gap-3 mb-6 pb-6 border-b border-border">
+              <SchoolCrest size={52} />
+              <div>
+                <p className="font-black text-primary text-lg leading-tight" style={{ fontFamily: "'Poppins',sans-serif" }}>Government Secondary School, Hong</p>
+                <p className="text-muted-foreground text-xs" style={{ fontFamily: "'Inter',sans-serif" }}>Official Student Result Slip</p>
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-3 mb-8 text-sm" style={{ fontFamily: "'Inter',sans-serif" }}>
+              <p><span className="text-muted-foreground">Name:</span> <span className="font-semibold text-foreground">{profile.name}</span></p>
+              <p><span className="text-muted-foreground">Admission No:</span> <span className="font-semibold text-foreground">{profile.admissionNo}</span></p>
+              <p><span className="text-muted-foreground">Class:</span> <span className="font-semibold text-foreground">{profile.className}</span></p>
+              <p><span className="text-muted-foreground">Session / Term:</span> <span className="font-semibold text-foreground">{current.session} · {current.term}</span></p>
+            </div>
+
+            <table className="w-full text-sm mb-6" style={{ fontFamily: "'Inter',sans-serif" }}>
+              <thead>
+                <tr className="text-left text-muted-foreground border-b border-border">
+                  <th className="py-2 pr-2">Subject</th>
+                  <th className="py-2 px-2 text-center">C.A. (30)</th>
+                  <th className="py-2 px-2 text-center">Exam (70)</th>
+                  <th className="py-2 px-2 text-center">Total (100)</th>
+                  <th className="py-2 pl-2 text-center">Grade</th>
+                </tr>
+              </thead>
+              <tbody>
+                {current.subjects.map(r => (
+                  <tr key={r.subject} className="border-b border-border/60">
+                    <td className="py-2.5 pr-2 font-medium text-foreground">{r.subject}</td>
+                    <td className="py-2.5 px-2 text-center text-muted-foreground">{r.ca}</td>
+                    <td className="py-2.5 px-2 text-center text-muted-foreground">{r.exam}</td>
+                    <td className="py-2.5 px-2 text-center font-semibold text-foreground">{r.total}</td>
+                    <td className="py-2.5 pl-2 text-center">
+                      <span className="px-2 py-0.5 rounded-full bg-accent/10 text-accent text-xs font-semibold">{r.grade}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <div className="flex items-center justify-between p-4 rounded-xl bg-primary/5">
+              <span className="font-semibold text-primary text-sm" style={{ fontFamily: "'Inter',sans-serif" }}>Term Average</span>
+              <span className="font-black text-primary text-lg" style={{ fontFamily: "'Poppins',sans-serif" }}>{current.average}%</span>
             </div>
           </div>
-
-          <div className="grid sm:grid-cols-2 gap-3 mb-8 text-sm" style={{ fontFamily: "'Inter',sans-serif" }}>
-            <p><span className="text-muted-foreground">Name:</span> <span className="font-semibold text-foreground">{student.name}</span></p>
-            <p><span className="text-muted-foreground">Admission No:</span> <span className="font-semibold text-foreground">{student.admissionNo}</span></p>
-            <p><span className="text-muted-foreground">Class:</span> <span className="font-semibold text-foreground">{student.class}</span></p>
-            <p><span className="text-muted-foreground">Session / Term:</span> <span className="font-semibold text-foreground">{student.session} · {student.term}</span></p>
+        ) : (
+          /* No results published yet */
+          <div className="bg-card rounded-3xl p-14 shadow-xl border border-border text-center">
+            <SchoolCrest size={56} />
+            <h3 className="text-xl font-black text-primary mt-6 mb-2" style={{ fontFamily: "'Poppins',sans-serif" }}>No results yet</h3>
+            <p className="text-muted-foreground text-sm max-w-sm mx-auto" style={{ fontFamily: "'Inter',sans-serif" }}>
+              No results have been published for your account. Check back after the end of term, or contact the Records office if you believe this is an error.
+            </p>
           </div>
-
-          <table className="w-full text-sm mb-6" style={{ fontFamily: "'Inter',sans-serif" }}>
-            <thead>
-              <tr className="text-left text-muted-foreground border-b border-border">
-                <th className="py-2 pr-2">Subject</th>
-                <th className="py-2 px-2 text-center">C.A. (30)</th>
-                <th className="py-2 px-2 text-center">Exam (70)</th>
-                <th className="py-2 px-2 text-center">Total (100)</th>
-                <th className="py-2 pl-2 text-center">Grade</th>
-              </tr>
-            </thead>
-            <tbody>
-              {results.map(r => (
-                <tr key={r.subject} className="border-b border-border/60">
-                  <td className="py-2.5 pr-2 font-medium text-foreground">{r.subject}</td>
-                  <td className="py-2.5 px-2 text-center text-muted-foreground">{r.ca}</td>
-                  <td className="py-2.5 px-2 text-center text-muted-foreground">{r.exam}</td>
-                  <td className="py-2.5 px-2 text-center font-semibold text-foreground">{r.total}</td>
-                  <td className="py-2.5 pl-2 text-center">
-                    <span className="px-2 py-0.5 rounded-full bg-accent/10 text-accent text-xs font-semibold">{r.grade}</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <div className="flex items-center justify-between p-4 rounded-xl bg-primary/5">
-            <span className="font-semibold text-primary text-sm" style={{ fontFamily: "'Inter',sans-serif" }}>Term Average</span>
-            <span className="font-black text-primary text-lg" style={{ fontFamily: "'Poppins',sans-serif" }}>{average}%</span>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
@@ -856,14 +1009,23 @@ function ResultsView({ admissionNo, onLogout }: { admissionNo: string; onLogout:
 
 // ─── RegisterPage (student portal registration — reachable only via /register) ─
 function RegisterPage() {
-  const [showPass, setShowPass] = useState(false);
-  const [form, setForm] = useState({ name: "", admissionNo: "", className: "", email: "", phone: "", password: "" });
+  const [form, setForm] = useState({ name: "", admissionNo: "", className: "", email: "", phone: "" });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   const inputClass = "w-full px-4 py-3 rounded-xl border border-border bg-white/70 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all placeholder:text-muted-foreground/55";
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError("");
+    setLoading(true);
+    const res = await registerStudent(form);
+    setLoading(false);
+    if (!res.ok) {
+      setError(res.error);
+      return;
+    }
     setSubmitted(true);
   }
 
@@ -876,7 +1038,7 @@ function RegisterPage() {
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-white mb-2" style={{ fontFamily: "'Poppins',sans-serif" }}>Portal Registration</h1>
           <p className="text-white/65 max-w-xl mx-auto text-sm">
-            Register for Student Portal access. Your details will be verified against school records before activation.
+            Register for Student Portal access. No password needed — you'll sign in with your default password after registering.
           </p>
         </div>
       </div>
@@ -892,58 +1054,63 @@ function RegisterPage() {
                 <div className="w-16 h-16 rounded-full bg-accent/15 flex items-center justify-center mx-auto mb-5">
                   <GraduationCap size={32} className="text-accent" />
                 </div>
-                <h3 className="text-2xl font-black text-primary mb-2" style={{ fontFamily: "'Poppins',sans-serif" }}>Registration Submitted</h3>
-                <p className="text-muted-foreground text-sm mb-6">
-                  Your request has been sent to the Records office for verification. You'll be notified once your portal access is active.
+                <h3 className="text-2xl font-black text-primary mb-2" style={{ fontFamily: "'Poppins',sans-serif" }}>Registered!</h3>
+                <p className="text-muted-foreground text-sm mb-2">
+                  Your account has been created. Sign in using your admission number with the default password:
                 </p>
-                <Link href="/" className="text-accent font-semibold text-sm hover:underline">
-                  ← Back to Student Portal
+                <p className="text-primary font-black text-xl mb-6" style={{ fontFamily: "'Poppins',sans-serif" }}>{DEFAULT_PASSWORD}</p>
+                <p className="text-muted-foreground text-xs mb-6">You can change this password after signing in.</p>
+                <Link href="/" className="inline-flex items-center gap-1.5 text-accent font-semibold text-sm hover:underline">
+                  ← Go to Student Portal Sign-In
                 </Link>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-semibold text-primary mb-1.5">Full Name *</label>
-                  <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Mustapha Sani" className={inputClass} required />
+                  <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Mustapha Sani" className={inputClass} required disabled={loading} />
                 </div>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-semibold text-primary mb-1.5">Admission Number *</label>
-                    <input type="text" value={form.admissionNo} onChange={e => setForm({ ...form, admissionNo: e.target.value })} placeholder="e.g. GSS/2024/00231" className={inputClass} required />
+                    <input type="text" value={form.admissionNo} onChange={e => setForm({ ...form, admissionNo: e.target.value })} placeholder="e.g. GSS/2024/00231" className={inputClass} required disabled={loading} />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-primary mb-1.5">Class *</label>
-                    <input type="text" value={form.className} onChange={e => setForm({ ...form, className: e.target.value })} placeholder="e.g. SS2 Science" className={inputClass} required />
+                    <input type="text" value={form.className} onChange={e => setForm({ ...form, className: e.target.value })} placeholder="e.g. SS2 Science" className={inputClass} required disabled={loading} />
                   </div>
                 </div>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-semibold text-primary mb-1.5">Parent/Guardian Email *</label>
-                    <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="you@example.com" className={inputClass} required />
+                    <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="you@example.com" className={inputClass} required disabled={loading} />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-primary mb-1.5">Phone Number *</label>
-                    <input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+234 800 000 0000" className={inputClass} required />
+                    <input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+234 800 000 0000" className={inputClass} required disabled={loading} />
                   </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-primary mb-1.5">Create Password *</label>
-                  <div className="relative">
-                    <input
-                      type={showPass ? "text" : "password"}
-                      value={form.password}
-                      onChange={e => setForm({ ...form, password: e.target.value })}
-                      placeholder="Minimum 8 characters"
-                      className={inputClass + " pr-12"}
-                      required
-                    />
-                    <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-all">
-                      {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                  </div>
+
+                {/* Default password notice */}
+                <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-primary/5 border border-primary/15">
+                  <Award size={16} className="text-primary flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-primary/80" style={{ fontFamily: "'Inter',sans-serif" }}>
+                    Your default password will be <span className="font-black">{DEFAULT_PASSWORD}</span>. You can change it after signing in.
+                  </p>
                 </div>
-                <button type="submit" className="w-full bg-primary text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-primary/90 transition-all shadow-md flex items-center justify-center gap-2 mt-2">
-                  Submit Registration <ArrowRight size={18} />
+
+                {error && (
+                  <p className="text-red-600 text-xs font-medium bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                    {error}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-primary text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-primary/90 transition-all shadow-md flex items-center justify-center gap-2 mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {loading ? "Creating account…" : <><span>Create Account</span><ArrowRight size={18} /></>}
                 </button>
                 <p className="text-center text-sm text-muted-foreground">
                   Already registered? <Link href="/" className="text-accent font-semibold hover:underline">Sign in to the portal</Link>
@@ -1209,8 +1376,8 @@ function ContactPage() {
 // ─── DeveloperPage ────────────────────────────────────────────────────────────
 function DeveloperPage() {
   const stack = [
-    { icon: <Code2 size={18} />,       label: "Web Development", detail: "Next.js, React, Tailwind CSS" },
-    { icon: <Terminal size={18} />,    label: "Systems & Backend", detail: "Golang, C++, Vite.js" },
+    { icon: <Code2 size={18} />,       label: "Web Development",  detail: "Next.js, React, Tailwind CSS, TypeScript" },
+    { icon: <Terminal size={18} />,    label: "Scripting & Tools", detail: "Python, TypeScript, Vite.js" },
     { icon: <ShieldCheck size={18} />, label: "Security Research", detail: "Offensive security, reverse engineering" },
   ];
 
@@ -1255,7 +1422,7 @@ function DeveloperPage() {
                 <Linkedin size={18} />
               </a>
               <a
-                href="https://github.com/0x-ZeroTrace"
+                href="https://github.com/Celebrityattitude2008"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary/85 transition-all shadow-md"
