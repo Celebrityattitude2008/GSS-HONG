@@ -13,19 +13,20 @@ import {
 } from "lucide-react";
 import developerPhoto from "./assets/paul-adamu.jpg";
 import AdminPage from "./pages/AdminPage";
+import bossMustaphaHall from "./assets/boss-mustapha-hall.jpg";
 
 // ─── Page type ────────────────────────────────────────────────────────────────
 type Page = "home" | "academics" | "portal" | "news" | "contact" | "developer";
 
 // ─── Image URLs ───────────────────────────────────────────────────────────────
 const IMGS = {
-  hero:      "https://images.unsplash.com/photo-1562774053-701939374585?w=1920&h=900&fit=crop&auto=format",
+  hero:      bossMustaphaHall,
   lab:       "https://images.unsplash.com/photo-1758685734153-132c8620c1bd?w=900&h=600&fit=crop&auto=format",
   teaching:  "https://images.unsplash.com/photo-1758685733987-54952cd1c8c6?w=900&h=600&fit=crop&auto=format",
   computer:  "https://images.unsplash.com/photo-1778489769184-45868633c527?w=900&h=600&fit=crop&auto=format",
   graduation:"https://images.unsplash.com/photo-1628198661856-102874fb9d82?w=900&h=600&fit=crop&auto=format",
   labExtra:  "https://images.unsplash.com/photo-1758685734201-72662f1a368d?w=900&h=600&fit=crop&auto=format",
-  campus2:   "https://images.unsplash.com/flagged/photo-1554473675-d0904f3cbf38?w=900&h=600&fit=crop&auto=format",
+  campus2:   bossMustaphaHall,
   f1:        "https://images.unsplash.com/photo-1614023342667-6f060e9d1e04?w=400&h=500&fit=crop&auto=format",
   f2:        "https://images.unsplash.com/photo-1573496527892-904f897eb744?w=400&h=500&fit=crop&auto=format",
   f3:        "https://images.unsplash.com/photo-1764169689207-e23fb66e1fcf?w=400&h=500&fit=crop&auto=format",
