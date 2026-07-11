@@ -15,6 +15,7 @@ import developerPhoto from "./assets/paul-adamu.jpg";
 import AdminPage from "./pages/AdminPage";
 import bossMustaphaHall from "./assets/boss-mustapha-hall.jpg";
 import principalYerimaEmmanuel from "./assets/principal-yerima-emmanuel.jpg";
+import vpFuldayaWilfred from "./assets/vp-fuldaya-wilfred.jpg";
 
 // ─── Page type ────────────────────────────────────────────────────────────────
 type Page = "home" | "academics" | "portal" | "news" | "contact" | "developer";
@@ -1244,7 +1245,7 @@ function ContactPage() {
 
   const faculty = [
     { name: "Mr. Yerima Emmanuel", role: "Principal",           img: principalYerimaEmmanuel, subject: "Educational Administration" },
-    { name: "Mrs. Aisha Musa", role: "Vice Principal (Academics)",img: IMGS.f2, subject: "Biology" },
+    { name: "Mr. Fuldaya Wilfred", role: "Vice Principal (Special Duties)", img: vpFuldayaWilfred, subject: "Biology" },
     { name: "Mr. James Oche",  role: "Vice Principal (Admin)",   img: IMGS.f3, subject: "Physics" },
   ];
 
