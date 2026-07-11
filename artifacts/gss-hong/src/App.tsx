@@ -1244,9 +1244,9 @@ function ContactPage() {
   }
 
   const faculty = [
-    { name: "Mr. Yerima Emmanuel", role: "Principal",           img: principalYerimaEmmanuel, subject: "Educational Administration" },
-    { name: "Mr. Fuldaya Wilfred", role: "Vice Principal (Special Duties)", img: vpFuldayaWilfred, subject: "Biology" },
-    { name: "Mr. James Oche",  role: "Vice Principal (Admin)",   img: IMGS.f3, subject: "Physics" },
+    { name: "Mr. Yerima Emmanuel", role: "Principal",           img: principalYerimaEmmanuel, subject: "Educational Administration", imgPosition: "center 12%" },
+    { name: "Mr. Fuldaya Wilfred", role: "Vice Principal (Special Duties)", img: vpFuldayaWilfred, subject: "Biology", imgPosition: "center 15%" },
+    { name: "Mr. James Oche",  role: "Vice Principal (Admin)",   img: IMGS.f3, subject: "Physics", imgPosition: "center top" },
   ];
 
   const contactInfo = [
@@ -1361,7 +1361,12 @@ function ContactPage() {
             {faculty.map((f, i) => (
               <div key={i} className="bg-card rounded-2xl overflow-hidden shadow-md hover:-translate-y-1.5 transition-all duration-300 border border-border group">
                 <div className="h-64 bg-primary overflow-hidden">
-                  <img src={f.img} alt={`${f.name}, ${f.role} at GSS Hong`} className="w-full h-full object-cover object-top group-hover:scale-105 transition-all duration-500" />
+                  <img
+                    src={f.img}
+                    alt={`${f.name}, ${f.role} at GSS Hong`}
+                    style={{ objectPosition: f.imgPosition ?? "center top" }}
+                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
+                  />
                 </div>
                 <div className="p-5">
                   <h3 className="font-black text-primary text-lg" style={{ fontFamily: "'Poppins',sans-serif" }}>{f.name}</h3>
