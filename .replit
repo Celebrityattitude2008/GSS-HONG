@@ -31,3 +31,15 @@ VITE_FIREBASE_STORAGE_BUCKET = "gss-hong-db.firebasestorage.app"
 
 [nix]
 channel = "stable-25_05"
+
+[[ports]]
+localPort = 8080
+externalPort = 80
+
+[[ports]]
+localPort = 8081
+externalPort = 8081
+
+[[ports]]
+localPort = 21741
+externalPort = 3000

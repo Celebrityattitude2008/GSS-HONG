@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Switch, Route, Link } from "wouter";
 import {
   registerStudent, loginStudent, fetchStudentResults,
   changeStudentPassword, logoutStudent, DEFAULT_PASSWORD,
   type StudentProfile, type TermResult,
 } from "./lib/portal";
+import { fetchAllNews, type NewsArticle } from "./lib/news";
 import {
   Menu, X, GraduationCap, FlaskConical, BookOpen, Users, Phone,
   Mail, MapPin, ArrowRight, Calendar, Microscope, Award, Send,
@@ -255,23 +256,15 @@ function HomePage({ setPage }: { setPage: (p: Page) => void }) {
     },
   ];
 
-  const news = [
-    {
-      img: IMGS.graduation, tag: "Achievement", date: "June 15, 2025",
-      title: "GSS Hong Records 94% Distinction Rate in 2025 WAEC",
-      excerpt: "Students excelled across both science and arts subjects, maintaining the school's position as one of Adamawa's top-performing institutions.",
-    },
-    {
-      img: IMGS.lab, tag: "Facilities", date: "May 3, 2025",
-      title: "New ₦45M Chemistry Laboratory Wing Commissioned",
-      excerpt: "The state-of-the-art facility houses 40 research-grade workstations with modern fume hood systems.",
-    },
-    {
-      img: IMGS.computer, tag: "Technology", date: "April 20, 2025",
-      title: "Alumni Association Donates 60 Workstations to ICT Hub",
-      excerpt: "Valued at ₦18 million, the donation was made during the annual alumni homecoming weekend in Hong.",
-    },
-  ];
+  const [news, setNews] = useState<NewsArticle[]>([]);
+  const [newsLoading, setNewsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchAllNews()
+      .then(all => setNews(all.slice(0, 3)))
+      .catch(() => setNews([]))
+      .finally(() => setNewsLoading(false));
+  }, []);
 
   return (
     <div>
@@ -496,25 +489,33 @@ function HomePage({ setPage }: { setPage: (p: Page) => void }) {
             </button>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {news.map((item, i) => (
-              <div key={i} className="rounded-2xl overflow-hidden bg-card shadow-md hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer border border-border">
-                <div className="relative h-52 bg-primary overflow-hidden">
-                  <img src={item.img} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500" />
-                  <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(13,59,110,0.55) 0%, transparent 60%)" }} />
-                  <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-accent text-white text-xs font-semibold" style={{ fontFamily: "'Inter',sans-serif" }}>{item.tag}</span>
-                </div>
-                <div className="p-5">
-                  <div className="flex items-center gap-2 text-muted-foreground text-xs mb-3" style={{ fontFamily: "'Inter',sans-serif" }}>
-                    <Calendar size={12} />
-                    {item.date}
+          {newsLoading ? (
+            <p className="text-muted-foreground text-sm text-center py-10" style={{ fontFamily: "'Inter',sans-serif" }}>Loading news…</p>
+          ) : news.length === 0 ? (
+            <p className="text-muted-foreground text-sm text-center py-10" style={{ fontFamily: "'Inter',sans-serif" }}>No news posted yet. Check back soon.</p>
+          ) : (
+            <div className="grid md:grid-cols-3 gap-6">
+              {news.map((item) => (
+                <div key={item.id} className="rounded-2xl overflow-hidden bg-card shadow-md hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer border border-border">
+                  <div className="relative h-52 bg-primary overflow-hidden">
+                    {item.image && (
+                      <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500" />
+                    )}
+                    <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(13,59,110,0.55) 0%, transparent 60%)" }} />
+                    <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-accent text-white text-xs font-semibold" style={{ fontFamily: "'Inter',sans-serif" }}>{item.category}</span>
                   </div>
-                  <h3 className="font-bold text-primary text-base mb-2 leading-snug" style={{ fontFamily: "'Poppins',sans-serif" }}>{item.title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed" style={{ fontFamily: "'Inter',sans-serif" }}>{item.excerpt}</p>
+                  <div className="p-5">
+                    <div className="flex items-center gap-2 text-muted-foreground text-xs mb-3" style={{ fontFamily: "'Inter',sans-serif" }}>
+                      <Calendar size={12} />
+                      {item.date}
+                    </div>
+                    <h3 className="font-bold text-primary text-base mb-2 leading-snug" style={{ fontFamily: "'Poppins',sans-serif" }}>{item.title}</h3>
+                    <p className="text-muted-foreground text-sm leading-relaxed" style={{ fontFamily: "'Inter',sans-serif" }}>{item.excerpt}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </div>
@@ -1111,42 +1112,18 @@ function RegisterPage() {
 // ─── NewsPage ─────────────────────────────────────────────────────────────────
 function NewsPage() {
   const [filter, setFilter] = useState("All");
-  const categories = ["All", "Academic", "Facilities", "Events", "Sports"];
+  const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const articles = [
-    {
-      img: IMGS.graduation, cat: "Academic", date: "June 15, 2025",
-      title: "2025 WAEC Results: 94% A1-B3 in Sciences",
-      excerpt: "Students excelled across Biology, Chemistry, Physics, and Mathematics, cementing the school's top-tier reputation.",
-    },
-    {
-      img: IMGS.lab, cat: "Facilities", date: "May 3, 2025",
-      title: "New ₦45M Chemistry Lab Wing Commissioned",
-      excerpt: "The governor commissioned the 40-workstation facility equipped with modern fume hoods and spectrophotometers.",
-    },
-    {
-      img: IMGS.computer, cat: "Facilities", date: "April 20, 2025",
-      title: "Alumni Donate 60 HP Workstations to ICT Hub",
-      excerpt: "The ₦18M donation was made during the annual alumni homecoming weekend, greatly expanding the school's digital capacity.",
-    },
-    {
-      img: IMGS.teaching, cat: "Academic", date: "March 10, 2025",
-      title: "GSS Hong Wins State Science Olympiad Gold",
-      excerpt: "Five SS2 students claimed gold at the Adamawa Science Olympiad, advancing to the national competition.",
-    },
-    {
-      img: IMGS.labExtra, cat: "Events", date: "February 7, 2025",
-      title: "Annual Science Fair: 120 Innovation Projects Displayed",
-      excerpt: "This year's theme — 'Technology for Sustainable Agriculture' — drew inventive entries from all three senior classes.",
-    },
-    {
-      img: IMGS.campus2, cat: "Events", date: "January 25, 2025",
-      title: "Class of 2000 Celebrates 25-Year Silver Reunion",
-      excerpt: "Over 200 alumni returned to campus for a memorable weekend, with a ₦5M donation pledged to the development fund.",
-    },
-  ];
+  useEffect(() => {
+    fetchAllNews()
+      .then(setArticles)
+      .catch(() => setArticles([]))
+      .finally(() => setLoading(false));
+  }, []);
 
-  const filtered = filter === "All" ? articles : articles.filter(a => a.cat === filter);
+  const categories = ["All", ...Array.from(new Set(articles.map(a => a.category))).sort()];
+  const filtered = filter === "All" ? articles : articles.filter(a => a.category === filter);
 
   return (
     <div className="pt-24 min-h-screen bg-background">
@@ -1157,56 +1134,66 @@ function NewsPage() {
 
       <section className="py-14 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-wrap gap-2 mb-10">
-            {categories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setFilter(cat)}
-                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${filter === cat ? "bg-primary text-white shadow-md" : "bg-white text-primary border border-border hover:border-primary/40"}`}
-                style={{ fontFamily: "'Inter',sans-serif" }}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map((article, i) => (
-              <article
-                key={i}
-                className="group cursor-pointer rounded-2xl overflow-hidden shadow-lg hover:-translate-y-1.5 transition-all duration-300 relative bg-primary"
-                style={{ minHeight: 400 }}
-              >
-                <img
-                  src={article.img}
-                  alt={article.title}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
-                />
-                <div
-                  className="absolute inset-0"
-                  style={{ background: "linear-gradient(to top, rgba(9,31,58,0.97) 0%, rgba(9,31,58,0.5) 50%, transparent 100%)" }}
-                />
-                <div className="absolute bottom-0 left-0 right-0 p-5">
-                  <div
-                    className="rounded-xl p-4"
-                    style={{
-                      background: "rgba(255,255,255,0.1)",
-                      backdropFilter: "blur(18px)",
-                      WebkitBackdropFilter: "blur(18px)",
-                      border: "1px solid rgba(255,255,255,0.18)",
-                    }}
+          {loading ? (
+            <p className="text-muted-foreground text-sm text-center py-20" style={{ fontFamily: "'Inter',sans-serif" }}>Loading news…</p>
+          ) : articles.length === 0 ? (
+            <p className="text-muted-foreground text-sm text-center py-20" style={{ fontFamily: "'Inter',sans-serif" }}>No news posted yet. Check back soon.</p>
+          ) : (
+            <>
+              <div className="flex flex-wrap gap-2 mb-10">
+                {categories.map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => setFilter(cat)}
+                    className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${filter === cat ? "bg-primary text-white shadow-md" : "bg-white text-primary border border-border hover:border-primary/40"}`}
+                    style={{ fontFamily: "'Inter',sans-serif" }}
                   >
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="px-2.5 py-0.5 rounded-full bg-accent text-white text-xs font-semibold" style={{ fontFamily: "'Inter',sans-serif" }}>{article.cat}</span>
-                      <span className="text-white/55 text-xs" style={{ fontFamily: "'Inter',sans-serif" }}>{article.date}</span>
+                    {cat}
+                  </button>
+                ))}
+              </div>
+
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filtered.map((article) => (
+                  <article
+                    key={article.id}
+                    className="group cursor-pointer rounded-2xl overflow-hidden shadow-lg hover:-translate-y-1.5 transition-all duration-300 relative bg-primary"
+                    style={{ minHeight: 400 }}
+                  >
+                    {article.image && (
+                      <img
+                        src={article.image}
+                        alt={article.title}
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
+                      />
+                    )}
+                    <div
+                      className="absolute inset-0"
+                      style={{ background: "linear-gradient(to top, rgba(9,31,58,0.97) 0%, rgba(9,31,58,0.5) 50%, transparent 100%)" }}
+                    />
+                    <div className="absolute bottom-0 left-0 right-0 p-5">
+                      <div
+                        className="rounded-xl p-4"
+                        style={{
+                          background: "rgba(255,255,255,0.1)",
+                          backdropFilter: "blur(18px)",
+                          WebkitBackdropFilter: "blur(18px)",
+                          border: "1px solid rgba(255,255,255,0.18)",
+                        }}
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="px-2.5 py-0.5 rounded-full bg-accent text-white text-xs font-semibold" style={{ fontFamily: "'Inter',sans-serif" }}>{article.category}</span>
+                          <span className="text-white/55 text-xs" style={{ fontFamily: "'Inter',sans-serif" }}>{article.date}</span>
+                        </div>
+                        <h3 className="text-white font-bold text-sm leading-snug mb-1.5" style={{ fontFamily: "'Poppins',sans-serif" }}>{article.title}</h3>
+                        <p className="text-white/60 text-xs leading-relaxed line-clamp-2" style={{ fontFamily: "'Inter',sans-serif" }}>{article.excerpt}</p>
+                      </div>
                     </div>
-                    <h3 className="text-white font-bold text-sm leading-snug mb-1.5" style={{ fontFamily: "'Poppins',sans-serif" }}>{article.title}</h3>
-                    <p className="text-white/60 text-xs leading-relaxed line-clamp-2" style={{ fontFamily: "'Inter',sans-serif" }}>{article.excerpt}</p>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
+                  </article>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </section>
     </div>

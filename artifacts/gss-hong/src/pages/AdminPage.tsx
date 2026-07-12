@@ -2,16 +2,38 @@ import { useState } from "react";
 import {
   LogOut, Users, Plus, Trash2, Save, Send, ArrowLeft,
   Eye, EyeOff, ChevronRight, BookOpen, CheckCircle, Clock,
-  RefreshCw,
+  RefreshCw, Newspaper, ImagePlus, X as XIcon, Pencil,
 } from "lucide-react";
 import {
   adminLogin, adminLogout, fetchAllStudents, fetchAllResultsForStudent,
   saveResult, toggleRelease, deleteResult, calcGrade,
   type StudentProfile, type TermResult, type SubjectResult,
 } from "../lib/portal";
+import {
+  fetchAllNews, createNews, updateNews, deleteNews, fileToBase64Image,
+  type NewsArticle,
+} from "../lib/news";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-type AdminView = "login" | "students" | "editing";
+type AdminView = "login" | "students" | "editing" | "news";
+
+const NEWS_CATEGORIES = ["Academic", "Facilities", "Events", "Sports", "Achievement", "Technology"];
+
+function todayDisplay(): string {
+  return new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+}
+
+interface NewsFormState {
+  title: string;
+  excerpt: string;
+  category: string;
+  date: string;
+  image: string;
+}
+
+const EMPTY_NEWS_FORM: NewsFormState = {
+  title: "", excerpt: "", category: NEWS_CATEGORIES[0], date: "", image: "",
+};
 
 interface SubjectRow {
   subject: string;
@@ -57,6 +79,15 @@ export default function AdminPage() {
   );
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  // news management
+  const [news, setNews] = useState<NewsArticle[]>([]);
+  const [newsLoading, setNewsLoading] = useState(false);
+  const [newsForm, setNewsForm] = useState<NewsFormState>(EMPTY_NEWS_FORM);
+  const [editingNewsId, setEditingNewsId] = useState<string | null>(null);
+  const [newsSaving, setNewsSaving] = useState(false);
+  const [newsMsg, setNewsMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [imageProcessing, setImageProcessing] = useState(false);
 
   // ─── Handlers ──────────────────────────────────────────────────────────────
 
@@ -163,6 +194,81 @@ export default function AdminPage() {
     setView("login");
     setStudents([]);
     setSelected(null);
+    setNews([]);
+    resetNewsForm();
+  }
+
+  // ─── News handlers ────────────────────────────────────────────────────────
+
+  function resetNewsForm() {
+    setNewsForm({ ...EMPTY_NEWS_FORM, date: todayDisplay() });
+    setEditingNewsId(null);
+    setNewsMsg(null);
+  }
+
+  async function goToNews() {
+    setView("news");
+    resetNewsForm();
+    setNewsLoading(true);
+    const list = await fetchAllNews();
+    setNews(list);
+    setNewsLoading(false);
+  }
+
+  async function handleNewsImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageProcessing(true);
+    try {
+      const base64 = await fileToBase64Image(file);
+      setNewsForm(f => ({ ...f, image: base64 }));
+    } catch {
+      setNewsMsg({ ok: false, text: "Could not process that image. Try a different file." });
+    }
+    setImageProcessing(false);
+  }
+
+  function handleEditNews(article: NewsArticle) {
+    setEditingNewsId(article.id);
+    setNewsForm({
+      title: article.title, excerpt: article.excerpt,
+      category: article.category, date: article.date, image: article.image,
+    });
+    setNewsMsg(null);
+  }
+
+  async function handleSaveNews(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newsForm.title.trim() || !newsForm.excerpt.trim()) {
+      setNewsMsg({ ok: false, text: "Title and excerpt are required." });
+      return;
+    }
+    setNewsSaving(true);
+    setNewsMsg(null);
+    const payload = {
+      title: newsForm.title.trim(),
+      excerpt: newsForm.excerpt.trim(),
+      category: newsForm.category,
+      date: newsForm.date.trim() || todayDisplay(),
+      image: newsForm.image,
+    };
+    const res = editingNewsId
+      ? await updateNews(editingNewsId, payload)
+      : await createNews(payload);
+    setNewsSaving(false);
+    if (!res.ok) { setNewsMsg({ ok: false, text: res.error }); return; }
+    setNewsMsg({ ok: true, text: editingNewsId ? "News article updated." : "News article published." });
+    resetNewsForm();
+    setNewsLoading(true);
+    setNews(await fetchAllNews());
+    setNewsLoading(false);
+  }
+
+  async function handleDeleteNews(article: NewsArticle) {
+    if (!confirm(`Delete "${article.title}"?`)) return;
+    await deleteNews(article.id);
+    setNews(prev => prev.filter(a => a.id !== article.id));
+    if (editingNewsId === article.id) resetNewsForm();
   }
 
   // ─── Render ────────────────────────────────────────────────────────────────
@@ -230,6 +336,12 @@ export default function AdminPage() {
             <span className="text-muted-foreground text-xs">{students.length} students</span>
           </div>
           <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
+              <button className="px-3 py-1.5 text-xs font-semibold rounded-md bg-white text-primary shadow-sm">Students</button>
+              <button onClick={goToNews} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md text-muted-foreground hover:text-primary transition-all">
+                <Newspaper size={13} /> News
+              </button>
+            </div>
             <button onClick={loadStudents} disabled={studentsLoading}
               className="text-muted-foreground hover:text-primary transition-all disabled:opacity-40" title="Refresh">
               <RefreshCw size={16} className={studentsLoading ? "animate-spin" : ""} />
@@ -264,6 +376,147 @@ export default function AdminPage() {
               ))}
             </div>
           )}
+        </div>
+      </div>
+    );
+  }
+
+  // ─── News management view ───────────────────────────────────────────────────
+  if (view === "news") {
+    return (
+      <div className="min-h-screen bg-background" style={{ fontFamily: "'Inter',sans-serif" }}>
+        <div className="sticky top-0 z-30 px-6 py-4 flex items-center justify-between border-b border-border bg-card/80 backdrop-blur-sm">
+          <div className="flex items-center gap-3">
+            <Newspaper size={20} className="text-primary" />
+            <h1 className="font-black text-primary text-lg" style={{ fontFamily: "'Poppins',sans-serif" }}>News Management</h1>
+            <span className="text-muted-foreground text-xs">{news.length} articles</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
+              <button onClick={() => { setView("students"); resetNewsForm(); }} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md text-muted-foreground hover:text-primary transition-all">
+                <Users size={13} /> Students
+              </button>
+              <button className="px-3 py-1.5 text-xs font-semibold rounded-md bg-white text-primary shadow-sm">News</button>
+            </div>
+            <button onClick={handleLogout}
+              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-all border border-border px-3 py-1.5 rounded-lg">
+              <LogOut size={14} /> Sign out
+            </button>
+          </div>
+        </div>
+
+        <div className="max-w-4xl mx-auto px-6 py-8 space-y-10">
+          {/* Existing articles */}
+          <section>
+            <h2 className="font-black text-primary mb-4" style={{ fontFamily: "'Poppins',sans-serif" }}>Published Articles</h2>
+            {newsLoading ? (
+              <p className="text-muted-foreground text-sm">Loading…</p>
+            ) : news.length === 0 ? (
+              <p className="text-muted-foreground text-sm">No articles yet. Use the form below to publish the first one.</p>
+            ) : (
+              <div className="space-y-2">
+                {news.map(article => (
+                  <div key={article.id} className="flex items-center gap-4 px-5 py-3.5 bg-card border border-border rounded-2xl">
+                    <div className="w-14 h-14 rounded-xl bg-muted flex-shrink-0 overflow-hidden">
+                      {article.image && <img src={article.image} alt={article.title} className="w-full h-full object-cover" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-foreground text-sm truncate">{article.title}</p>
+                      <p className="text-muted-foreground text-xs mt-0.5">{article.category} · {article.date}</p>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <button onClick={() => handleEditNews(article)}
+                        className="p-1.5 text-muted-foreground hover:text-primary transition-all" title="Edit">
+                        <Pencil size={14} />
+                      </button>
+                      <button onClick={() => handleDeleteNews(article)}
+                        className="p-1.5 text-muted-foreground hover:text-red-500 transition-all" title="Delete">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* Create / edit form */}
+          <section>
+            <h2 className="font-black text-primary mb-4" style={{ fontFamily: "'Poppins',sans-serif" }}>
+              {editingNewsId ? "Edit Article" : "Publish New Article"}
+            </h2>
+            <form onSubmit={handleSaveNews} className="bg-card border border-border rounded-3xl p-6 shadow-sm space-y-5">
+              <div>
+                <label className="block text-sm font-semibold text-primary mb-1.5">Photo</label>
+                <div className="flex items-center gap-4">
+                  <div className="w-28 h-20 rounded-xl bg-muted overflow-hidden flex items-center justify-center flex-shrink-0 border border-border">
+                    {newsForm.image
+                      ? <img src={newsForm.image} alt="" className="w-full h-full object-cover" />
+                      : <ImagePlus size={20} className="text-muted-foreground" />}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="cursor-pointer px-3 py-2 text-xs font-semibold border border-border rounded-lg hover:bg-primary/5 text-primary transition-all">
+                      {imageProcessing ? "Processing…" : "Choose photo"}
+                      <input type="file" accept="image/*" className="hidden" disabled={imageProcessing} onChange={handleNewsImageChange} />
+                    </label>
+                    {newsForm.image && (
+                      <button type="button" onClick={() => setNewsForm(f => ({ ...f, image: "" }))}
+                        className="p-2 text-muted-foreground hover:text-red-500 transition-all" title="Remove photo">
+                        <XIcon size={14} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-primary mb-1.5">Title</label>
+                <input value={newsForm.title} onChange={e => setNewsForm(f => ({ ...f, title: e.target.value }))}
+                  placeholder="e.g. GSS Hong Records 94% Distinction Rate in 2025 WAEC"
+                  className={inputCls} required />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-primary mb-1.5">Excerpt</label>
+                <textarea value={newsForm.excerpt} onChange={e => setNewsForm(f => ({ ...f, excerpt: e.target.value }))}
+                  placeholder="A short summary shown on the news cards…" rows={3}
+                  className={inputCls} required />
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-primary mb-1.5">Category</label>
+                  <select value={newsForm.category} onChange={e => setNewsForm(f => ({ ...f, category: e.target.value }))} className={inputCls}>
+                    {NEWS_CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-primary mb-1.5">Date</label>
+                  <input value={newsForm.date} onChange={e => setNewsForm(f => ({ ...f, date: e.target.value }))}
+                    placeholder={todayDisplay()} className={inputCls} />
+                </div>
+              </div>
+
+              {newsMsg && (
+                <p className={`text-sm font-medium px-3 py-2 rounded-lg border ${newsMsg.ok ? "text-green-700 bg-green-50 border-green-200" : "text-red-600 bg-red-50 border-red-200"}`}>
+                  {newsMsg.text}
+                </p>
+              )}
+
+              <div className="flex flex-wrap gap-3">
+                <button type="submit" disabled={newsSaving || imageProcessing}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-accent text-white rounded-xl text-sm font-semibold hover:bg-accent/90 transition-all disabled:opacity-60">
+                  <Send size={15} /> {newsSaving ? "Publishing…" : editingNewsId ? "Save Changes" : "Publish Article"}
+                </button>
+                {editingNewsId && (
+                  <button type="button" onClick={resetNewsForm}
+                    className="px-5 py-2.5 border border-border rounded-xl text-sm font-semibold text-muted-foreground hover:bg-muted/40 transition-all">
+                    Cancel
+                  </button>
+                )}
+              </div>
+            </form>
+          </section>
         </div>
       </div>
     );

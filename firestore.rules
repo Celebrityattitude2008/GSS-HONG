@@ -46,5 +46,14 @@ service cloud.firestore {
         allow write: if isAdmin();
       }
     }
+
+    // ── News collection ───────────────────────────────────────────────────────
+    // News is publicly readable by anyone (including signed-out visitors) so
+    // the homepage and news page can display it. Only admins may create,
+    // update, or delete articles from the admin dashboard.
+    match /news/{newsId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
   }
 }
