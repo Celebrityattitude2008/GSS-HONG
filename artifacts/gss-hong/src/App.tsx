@@ -19,6 +19,7 @@ import vpFuldayaWilfred from "./assets/vp-fuldaya-wilfred.jpg";
 import vpYusufSuleiman from "./assets/vp-yusuf-suleiman.jpg";
 import classroomTeaching from "./assets/classroom-teaching.jpg";
 import physicsLabSaiduMusa from "./assets/physics-lab-saidu-musa.jpg";
+import biologyLab from "./assets/biology-lab.jpg";
 
 // ─── Page type ────────────────────────────────────────────────────────────────
 type Page = "home" | "academics" | "portal" | "news" | "contact" | "developer";
@@ -527,7 +528,7 @@ function AcademicsPage({ setPage }: { setPage: (p: Page) => void }) {
       head: "Mrs. Fatima Yusuf, B.Sc., PGDE",
       desc: "The Biology laboratory houses 32 compound microscopes, full dissection kits, a preserved specimen library, and a dedicated genetics study room. Annual field ecology trips to Gashaka-Gumti National Park supplement classroom learning with real-world environmental science.",
       features: ["32 compound microscopes", "Preserved specimen library", "Genetics study room", "Annual ecology field trips"],
-      img: IMGS.teaching,
+      img: biologyLab,
     },
     {
       icon: <Atom size={32} />,
@@ -563,8 +564,13 @@ function AcademicsPage({ setPage }: { setPage: (p: Page) => void }) {
         <div className="max-w-7xl mx-auto space-y-20">
           {depts.map((dept, i) => (
             <div key={i} className={`grid md:grid-cols-2 gap-12 items-center ${i % 2 === 1 ? "md:[&>*:first-child]:order-last" : ""}`}>
-              <div className="rounded-2xl overflow-hidden shadow-2xl aspect-[4/3] bg-primary">
-                <img src={dept.img} alt={dept.name} className="w-full h-full object-cover" />
+              <div className="group rounded-2xl overflow-hidden shadow-2xl aspect-[4/3] bg-primary">
+                <img
+                  src={dept.img}
+                  alt={dept.name}
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-active:grayscale-0 group-focus-within:grayscale-0 transition-all duration-500"
+                  tabIndex={0}
+                />
               </div>
               <div>
                 <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-5">
