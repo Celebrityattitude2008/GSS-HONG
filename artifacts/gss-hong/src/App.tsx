@@ -11,6 +11,7 @@ import {
   Mail, MapPin, ArrowRight, Calendar, Microscope, Award, Send,
   Atom, Eye, EyeOff, ChevronRight, Cpu, Landmark, Printer,
   LogOut, IdCard, Linkedin, Github, Code2, ShieldCheck, Terminal,
+  Briefcase,
 } from "lucide-react";
 import developerPhoto from "./assets/paul-adamu.jpg";
 import AdminPage from "./pages/AdminPage";
@@ -220,7 +221,7 @@ function Footer({ setPage }: { setPage: (p: Page) => void }) {
         </div>
       </div>
       <div className="max-w-7xl mx-auto mt-12 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-3">
-        <p className="text-white/35 text-xs" style={{ fontFamily: "'Inter',sans-serif" }}>© 2025 Government Secondary School, Hong. All rights reserved.</p>
+        <p className="text-white/35 text-xs" style={{ fontFamily: "'Inter',sans-serif" }}>© 2026 Government Secondary School, Hong. All rights reserved.</p>
         <p className="text-white/25 text-xs" style={{ fontFamily: "'Inter',sans-serif" }}>Adamawa State Ministry of Education</p>
       </div>
     </footer>
@@ -233,7 +234,7 @@ function HomePage({ setPage }: { setPage: (p: Page) => void }) {
 
   const stats = [
     { val: "1967", label: "Year Founded" },
-    { val: "10,000+", label: "Alumni Worldwide" },
+    { val: "20,000+", label: "Alumni Worldwide" },
     { val: "6", label: "Academic Depts." },
     { val: "Top 10", label: "State Ranking" },
   ];
@@ -542,11 +543,11 @@ function AcademicsPage({ setPage }: { setPage: (p: Page) => void }) {
       img: physicsLabSaiduMusa,
     },
     {
-      icon: <BookOpen size={32} />,
-      name: "Literature & Languages Department",
+      icon: <Briefcase size={32} />,
+      name: "Business & Commercial Department",
       head: "Mrs. Blessing Danjuma, B.A., PGDE",
-      desc: "Our Arts wing's flagship department cultivates strong readers, writers, and communicators through Literature-in-English, English Language, and Hausa Language tracks. Students build the analytical and rhetorical skills valued across law, media, and public service careers.",
-      features: ["Well-stocked school library", "Debate & literary society", "WAEC Literature specialists", "Creative writing workshops"],
+      desc: "Our Commercial wing's flagship department equips students with practical financial and enterprise skills through Accounting, Commerce, and Economics tracks. Students graduate with the numeracy, bookkeeping, and business-thinking skills valued across banking, trade, and entrepreneurship careers.",
+      features: ["Book-keeping & accounting lab", "Young entrepreneurs club", "WAEC Commerce specialists", "Mock trading & business workshops"],
       img: schoolGrounds,
     },
   ];
