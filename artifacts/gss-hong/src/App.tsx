@@ -21,6 +21,7 @@ import classroomTeaching from "./assets/classroom-teaching.jpg";
 import physicsLabSaiduMusa from "./assets/physics-lab-saidu-musa.jpg";
 import biologyLab from "./assets/biology-lab.jpg";
 import schoolGrounds from "./assets/school-grounds.jpg";
+import studentsPortal from "./assets/students-portal.jpg";
 
 // ─── Page type ────────────────────────────────────────────────────────────────
 type Page = "home" | "academics" | "portal" | "news" | "contact" | "developer";
@@ -436,7 +437,7 @@ function HomePage({ setPage }: { setPage: (p: Page) => void }) {
           <div className="rounded-3xl overflow-hidden relative" style={{ background: "linear-gradient(135deg, #0D3B6E, #1a5295)" }}>
             <div
               className="absolute inset-0 opacity-15"
-              style={{ backgroundImage: `url(${IMGS.graduation})`, backgroundSize: "cover", backgroundPosition: "center" }}
+              style={{ backgroundImage: `url(${studentsPortal})`, backgroundSize: "cover", backgroundPosition: "center" }}
             />
             <div className="relative z-10 grid md:grid-cols-[3fr_2fr] items-center">
               <div className="p-12 md:p-16">
