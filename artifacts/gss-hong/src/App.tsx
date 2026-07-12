@@ -210,7 +210,7 @@ function Footer({ setPage }: { setPage: (p: Page) => void }) {
           <h4 className="font-bold text-sm mb-4 text-white/85" style={{ fontFamily: "'Poppins',sans-serif" }}>Contact</h4>
           <ul className="space-y-3 text-sm text-white/50" style={{ fontFamily: "'Inter',sans-serif" }}>
             <li className="flex gap-2 items-start"><MapPin size={14} className="flex-shrink-0 mt-0.5 text-accent" />Hong, Adamawa State, Nigeria</li>
-            <li className="flex gap-2 items-start"><Phone size={14} className="flex-shrink-0 mt-0.5 text-accent" />+234 803 000 0123</li>
+            <li className="flex gap-2 items-start"><Phone size={14} className="flex-shrink-0 mt-0.5 text-accent" />07039210066</li>
             <li className="flex gap-2 items-start"><Mail size={14} className="flex-shrink-0 mt-0.5 text-accent" />info@gsshong.edu.ng</li>
           </ul>
         </div>
@@ -1223,7 +1223,7 @@ function ContactPage() {
 
   const contactInfo = [
     { icon: <MapPin size={22} />, label: "Address",    value: "Government Secondary School\nHong, Adamawa State, Nigeria" },
-    { icon: <Phone size={22} />,  label: "Phone",      value: "+234 803 000 0123\n+234 806 000 0456" },
+    { icon: <Phone size={22} />,  label: "Phone",      value: "07039210066" },
     { icon: <Mail size={22} />,   label: "Email",      value: "info@gsshong.edu.ng\nresults@gsshong.edu.ng" },
   ];
 
