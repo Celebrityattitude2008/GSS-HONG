@@ -17,6 +17,7 @@ import bossMustaphaHall from "./assets/boss-mustapha-hall.jpg";
 import principalYerimaEmmanuel from "./assets/principal-yerima-emmanuel.jpg";
 import vpFuldayaWilfred from "./assets/vp-fuldaya-wilfred.jpg";
 import vpYusufSuleiman from "./assets/vp-yusuf-suleiman.jpg";
+import classroomTeaching from "./assets/classroom-teaching.jpg";
 
 // ─── Page type ────────────────────────────────────────────────────────────────
 type Page = "home" | "academics" | "portal" | "news" | "contact" | "developer";
@@ -370,7 +371,7 @@ function HomePage({ setPage }: { setPage: (p: Page) => void }) {
 
           <div className="relative">
             <div className="rounded-2xl overflow-hidden shadow-2xl aspect-[4/3] bg-primary">
-              <img src={IMGS.teaching} alt="Teacher guiding a student through a science experiment in the GSS Hong laboratory" className="w-full h-full object-cover" />
+              <img src={classroomTeaching} alt="Teacher guiding students in a GSS Hong classroom" className="w-full h-full object-cover" />
             </div>
             <div
               className="absolute -bottom-5 -left-5 p-4 rounded-2xl shadow-2xl"
