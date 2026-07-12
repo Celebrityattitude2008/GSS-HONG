@@ -20,6 +20,7 @@ import vpYusufSuleiman from "./assets/vp-yusuf-suleiman.jpg";
 import classroomTeaching from "./assets/classroom-teaching.jpg";
 import physicsLabSaiduMusa from "./assets/physics-lab-saidu-musa.jpg";
 import biologyLab from "./assets/biology-lab.jpg";
+import schoolGrounds from "./assets/school-grounds.jpg";
 
 // ─── Page type ────────────────────────────────────────────────────────────────
 type Page = "home" | "academics" | "portal" | "news" | "contact" | "developer";
@@ -544,7 +545,7 @@ function AcademicsPage({ setPage }: { setPage: (p: Page) => void }) {
       head: "Mrs. Blessing Danjuma, B.A., PGDE",
       desc: "Our Arts wing's flagship department cultivates strong readers, writers, and communicators through Literature-in-English, English Language, and Hausa Language tracks. Students build the analytical and rhetorical skills valued across law, media, and public service careers.",
       features: ["Well-stocked school library", "Debate & literary society", "WAEC Literature specialists", "Creative writing workshops"],
-      img: IMGS.teaching,
+      img: schoolGrounds,
     },
   ];
 
