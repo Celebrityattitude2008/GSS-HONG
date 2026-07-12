@@ -18,6 +18,7 @@ import principalYerimaEmmanuel from "./assets/principal-yerima-emmanuel.jpg";
 import vpFuldayaWilfred from "./assets/vp-fuldaya-wilfred.jpg";
 import vpYusufSuleiman from "./assets/vp-yusuf-suleiman.jpg";
 import classroomTeaching from "./assets/classroom-teaching.jpg";
+import physicsLabSaiduMusa from "./assets/physics-lab-saidu-musa.jpg";
 
 // ─── Page type ────────────────────────────────────────────────────────────────
 type Page = "home" | "academics" | "portal" | "news" | "contact" | "developer";
@@ -185,10 +186,8 @@ function Footer({ setPage }: { setPage: (p: Page) => void }) {
           {
             title: "Departments",
             items: [
-              { label: "Chemistry",           page: "academics" as Page },
               { label: "Biology",             page: "academics" as Page },
               { label: "Physics",             page: "academics" as Page },
-              { label: "Computer Science",    page: "academics" as Page },
               { label: "Arts & Humanities",   page: "academics" as Page },
             ],
           },
@@ -238,23 +237,18 @@ function HomePage({ setPage }: { setPage: (p: Page) => void }) {
   const programs = [
     {
       icon: <FlaskConical size={28} />,
-      title: "Pure Sciences",
+      title: "Science",
       desc: "Biology, Chemistry, and Physics — each with dedicated laboratory facilities and qualified department heads.",
     },
     {
       icon: <Landmark size={28} />,
-      title: "Arts & Humanities",
+      title: "Arts",
       desc: "Literature-in-English, Government, Economics, and CRS/IRS tracks that build strong communicators and critical thinkers.",
     },
     {
-      icon: <Cpu size={28} />,
-      title: "Computer Science",
-      desc: "Modern ICT hub with 60+ HP workstations, fiber-optic internet, and practical programming curriculum.",
-    },
-    {
-      icon: <Atom size={28} />,
-      title: "Applied Mathematics",
-      desc: "Mathematics and Further Mathematics tracks that prepare students for competitive university entrance.",
+      icon: <BookOpen size={28} />,
+      title: "Commercial",
+      desc: "Accounting, Commerce, and Economics tracks that prepare students for careers in business, finance, and trade.",
     },
   ];
 
@@ -528,14 +522,6 @@ function HomePage({ setPage }: { setPage: (p: Page) => void }) {
 function AcademicsPage({ setPage }: { setPage: (p: Page) => void }) {
   const depts = [
     {
-      icon: <FlaskConical size={32} />,
-      name: "Chemistry Department",
-      head: "Mr. Ibrahim Abubakar, M.Sc.",
-      desc: "Our Chemistry department features a newly commissioned 40-seat laboratory equipped with modern titration apparatus, spectrophotometers, Bunsen burner rigs, and dedicated fume hoods. Students engage in practicals aligned with the current WAEC/NECO syllabus, developing analytical and problem-solving skills.",
-      features: ["40-seat research laboratory", "Gas-based Bunsen rigs", "Industrial safety training", "Organic & Inorganic tracks"],
-      img: IMGS.lab,
-    },
-    {
       icon: <Microscope size={32} />,
       name: "Biology Department",
       head: "Mrs. Fatima Yusuf, B.Sc., PGDE",
@@ -546,18 +532,10 @@ function AcademicsPage({ setPage }: { setPage: (p: Page) => void }) {
     {
       icon: <Atom size={32} />,
       name: "Physics Department",
-      head: "Mr. Daniel Okon, B.Eng.",
+      head: "Mr. Saidu Musa, B.Eng.",
       desc: "Physics at GSS Hong is delivered with precision instruments including oscilloscopes, optical benches, electronics breadboards, and Vernier caliper kits. The department consistently produces finalists in state and national physics olympiad competitions.",
       features: ["Oscilloscopes & generators", "Optics & mechanics lab", "Electronics workshop", "National olympiad finalists"],
-      img: IMGS.labExtra,
-    },
-    {
-      icon: <Cpu size={32} />,
-      name: "Computer Science",
-      head: "Mr. Emeka Nwosu, B.Sc., CCNA",
-      desc: "The ICT Hub boasts 60 HP workstations, fiber-optic broadband, and licensed Microsoft and Adobe suites. Students learn Python programming, HTML/CSS web development, networking fundamentals, and digital literacy — skills that bridge the gap to higher education.",
-      features: ["60 HP workstations", "Fiber-optic broadband", "Python & web development", "Networking administration"],
-      img: IMGS.computer,
+      img: physicsLabSaiduMusa,
     },
     {
       icon: <BookOpen size={32} />,
@@ -566,14 +544,6 @@ function AcademicsPage({ setPage }: { setPage: (p: Page) => void }) {
       desc: "Our Arts wing's flagship department cultivates strong readers, writers, and communicators through Literature-in-English, English Language, and Hausa Language tracks. Students build the analytical and rhetorical skills valued across law, media, and public service careers.",
       features: ["Well-stocked school library", "Debate & literary society", "WAEC Literature specialists", "Creative writing workshops"],
       img: IMGS.teaching,
-    },
-    {
-      icon: <Landmark size={32} />,
-      name: "Government & Social Studies Department",
-      head: "Mr. Yusuf Adamu, B.Sc. (Pol. Sci.)",
-      desc: "Covering Government, Economics, and CRS/IRS, this department prepares Arts-track students for careers in law, public administration, and the social sciences through case-study driven, discussion-based learning.",
-      features: ["Government & Economics", "CRS / IRS tracks", "Mock parliamentary debates", "Civic education projects"],
-      img: IMGS.campus2,
     },
   ];
 
@@ -584,7 +554,7 @@ function AcademicsPage({ setPage }: { setPage: (p: Page) => void }) {
         <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-accent text-xs font-semibold uppercase tracking-wider mb-4" style={{ fontFamily: "'Inter',sans-serif" }}>Academics</span>
         <h1 className="text-5xl md:text-6xl font-black text-white mb-4" style={{ fontFamily: "'Poppins',sans-serif" }}>Science &amp; Arts Curriculum</h1>
         <p className="text-white/65 max-w-2xl mx-auto text-base" style={{ fontFamily: "'Inter',sans-serif" }}>
-          GSS Hong delivers a comprehensive, WAEC-aligned curriculum spanning both the Science and Arts tracks across six specialist departments, each led by experienced, qualified staff.
+          GSS Hong delivers a comprehensive, WAEC-aligned curriculum spanning the Science, Arts, and Commercial tracks across specialist departments, each led by experienced, qualified staff.
         </p>
       </div>
 
